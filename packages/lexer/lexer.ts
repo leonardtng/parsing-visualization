@@ -15,15 +15,15 @@ export const lexer: Lexer = (lexRules: LexRules, str: string) => {
 
   while (true) {
     whitespace.lastIndex = position;
-    let match = whitespace.exec(str) as MatchResult | null;
+    let whitespaceMatchResult = whitespace.exec(str) as MatchResult | null;
 
-    if (match) position = match.indices[0][1];
+    if (whitespaceMatchResult) position = whitespaceMatchResult.indices[0][1];
 
-    const token = terminalRules
+    const token: Token | null = terminalRules
       .map((rule) => {
         rule.regex.lastIndex = position;
-        const match = rule.regex.exec(str) as MatchResult | null;
-        return match ? new Token(rule.terminal, match) : null;
+        const matchResult = rule.regex.exec(str) as MatchResult | null;
+        return matchResult ? { terminal: rule.terminal, matchResult } : null;
       })
       .reduce((acc: Token | null, curr: Token | null) => {
         if (!acc) return curr;
