@@ -114,17 +114,17 @@ export class Chart {
 
     const positions: Set<number> = new Set();
 
-    for (const [start, endMap] of Array.from(this.symbols)) {
+    for (const [start, endMap] of this.symbols) {
       positions.add(start);
-      for (var [end] of Array.from(endMap)) {
+      for (var [end] of endMap) {
         positions.add(end);
       }
     }
 
-    for (const [start, endMap] of Array.from(this.items)) {
+    for (const [start, endMap] of this.items) {
       positions.add(start);
 
-      for (var [end] of Array.from(endMap)) {
+      for (var [end] of endMap) {
         positions.add(end);
       }
     }
@@ -153,3 +153,4 @@ export class Chart {
 // 2, 2, S
 // 3, 4, B
 // 3, 3, S
+// 4, 4, S
