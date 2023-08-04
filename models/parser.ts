@@ -52,6 +52,13 @@ export const consume = (item: Item): [Symbol, Item] | null => {
   ];
 };
 
+export const epsilonItems = (productionMap: ParseRules["productionMap"]) =>
+  new Set(
+    Array.from(productionMap).flatMap(([lhs, rhsSet]) =>
+      Array.from(rhsSet).flatMap((rhs) => ({ lhs, rhs, consumed: 0 }))
+    )
+  );
+
 export class Chart {
   symbols: AutoMap<number, AutoMap<number, Set<Symbol>>> = new AutoMap(
     () => new AutoMap(() => new Set())
@@ -102,21 +109,30 @@ export class Chart {
     }
   }
 
-  addEpsilonItem(position: number, productionMap: ParseRules["productionMap"]) {
-    productionMap.forEach((rhsSet, lhs) => {
-      rhsSet.forEach((rhs) => {
-        this.addItem(position, position, { lhs, rhs, consumed: 0 }, undefined);
-      });
-    });
-  }
-
   addEpsilonItems(productionMap: ParseRules["productionMap"]) {
-    this.nextItems.forEach((_, position) => {
-      this.addEpsilonItem(position, productionMap);
-    });
+    const items = epsilonItems(productionMap);
 
-    this.symbolEnds.forEach((_, position) => {
-      this.addEpsilonItem(position, productionMap);
+    const positions: Set<number> = new Set();
+
+    for (const [start, endMap] of Array.from(this.symbols)) {
+      positions.add(start);
+      for (var [end] of Array.from(endMap)) {
+        positions.add(end);
+      }
+    }
+
+    for (const [start, endMap] of Array.from(this.items)) {
+      positions.add(start);
+
+      for (var [end] of Array.from(endMap)) {
+        positions.add(end);
+      }
+    }
+
+    positions.forEach((position) => {
+      items.forEach((item) => {
+        this.addItem(position, position, item, undefined);
+      });
     });
   }
 
@@ -126,3 +142,14 @@ export class Chart {
     });
   }
 }
+
+// 0, 1, A
+// 0, 0, S
+// 0, 4, S
+// 1, 2, A
+// 1, 1, S
+// 1, 3, S
+// 2, 3, B
+// 2, 2, S
+// 3, 4, B
+// 3, 3, S

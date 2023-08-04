@@ -1,0 +1,18 @@
+{
+  "start": "S",
+  "productionMap": {
+    "S": [
+      ["Label", ["A", ["Label", "S"], ["Label", "B"]]],
+      ["Label", []]
+    ],
+    "T": [
+      { "Label": ["A", { "Label": "S" }, { "Label": "B" }] },
+      { "Label": [] }
+    ]
+  },
+  "whitespace": "\\s+",
+  "terminalRules": [
+    ["A", "A"],
+    ["B", "B B"]
+  ]
+}
