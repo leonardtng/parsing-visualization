@@ -1,4 +1,4 @@
-import { parser } from "@/packages";
+import { parser } from "@/packages/parsing";
 import "@testing-library/jest-dom";
 
 describe("Parser Test Suite", () => {

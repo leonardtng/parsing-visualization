@@ -30,7 +30,17 @@ export type MatchResult = RegExpMatchArray & {
   indices: Array<[number, number]>;
 };
 
-export interface Token {
-  terminal: Terminal;
-  matchResult: MatchResult;
+export interface RhsElement {
+  label: string | undefined;
+  symbol: Symbol;
+}
+
+export interface Rhs {
+  label: string | undefined;
+  elements: RhsElement[];
+}
+
+export interface ParseRules {
+  start: Symbol;
+  productionMap: Map<Nonterminal, Set<Rhs>>;
 }

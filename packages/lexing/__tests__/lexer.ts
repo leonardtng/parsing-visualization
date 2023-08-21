@@ -1,5 +1,5 @@
-import { lexer } from "@/packages";
-import { LexRules, Terminal, TerminalRule, Token } from "@/models";
+import { LexRules, Terminal, TerminalRule } from "@/packages/grammar";
+import { Token, lexer } from "@/packages/lexing";
 import "@testing-library/jest-dom";
 
 describe("Lexer Test Suite", () => {

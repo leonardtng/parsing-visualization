@@ -1,4 +1,5 @@
-import { Nonterminal, Symbol } from "@/models";
+import { ParseRules, Symbol } from "@/packages/grammar";
+import { Item, consume } from "@/packages/parsing";
 
 export class AutoMap<K, V> extends Map<K, V> {
   makeDefaultValue: () => V;
@@ -15,42 +16,6 @@ export class AutoMap<K, V> extends Map<K, V> {
     return super.get(key) as V;
   }
 }
-
-export interface RhsElement {
-  label: string | undefined;
-  symbol: Symbol;
-}
-
-export interface Rhs {
-  label: string | undefined;
-  elements: RhsElement[];
-}
-
-export interface ParseRules {
-  start: Symbol;
-  productionMap: Map<Nonterminal, Set<Rhs>>;
-}
-
-export interface Item {
-  lhs: Nonterminal;
-  rhs: Rhs;
-  consumed: number;
-}
-
-export const consume = (item: Item): [Symbol, Item] | null => {
-  const { lhs, rhs, consumed } = item;
-
-  if (consumed >= rhs.elements.length) return null;
-
-  return [
-    rhs.elements[consumed].symbol,
-    {
-      lhs,
-      rhs,
-      consumed: consumed + 1,
-    },
-  ];
-};
 
 export const epsilonItems = (productionMap: ParseRules["productionMap"]) =>
   new Set(
@@ -142,15 +107,3 @@ export class Chart {
     });
   }
 }
-
-// 0, 1, A
-// 0, 0, S
-// 0, 4, S
-// 1, 2, A
-// 1, 1, S
-// 1, 3, S
-// 2, 3, B
-// 2, 2, S
-// 3, 4, B
-// 3, 3, S
-// 4, 4, S

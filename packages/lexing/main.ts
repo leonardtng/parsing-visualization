@@ -1,4 +1,5 @@
-import { LexRules, MatchResult, Token } from "@/models";
+import { LexRules, MatchResult } from "@/packages/grammar";
+import { Token } from "@/packages/lexing";
 
 type Lexer = (
   lexRules: LexRules,
