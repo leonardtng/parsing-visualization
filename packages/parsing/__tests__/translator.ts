@@ -1,18 +1,54 @@
-import { Nonterminal, ParseRules } from "@/packages/grammar";
+import { Nonterminal, ParseRules, Terminal } from "@/packages/grammar";
 import { Json, translator } from "@/packages/parsing";
-import input from "./input/matching-pairs.json";
+import matchingPairs from "./input/matching-pairs.json";
+import wellFormedParentheses from "./input/well-formed-parentheses.json";
 import "@testing-library/jest-dom";
 
 describe("Translator Test Suite", () => {
+  const checkInput = (
+    input: ParseRules,
+    expected: ParseRules,
+    productionMapKeys: Nonterminal[]
+  ) => {
+    // Compare start
+    expect(input.start).toEqual(expected.start);
+
+    // Compare productionMap
+    expect(input.productionMap.size).toEqual(expected.productionMap.size);
+
+    const inputProductionMapKeys = input.productionMap.keys();
+    const inputProductionMapValues = input.productionMap.values();
+
+    productionMapKeys.forEach((expectedKey) => {
+      // Check if key exists in inputParseRules and is the same as expectedKey
+      const inputKey = inputProductionMapKeys.next().value;
+      expect(inputKey).toEqual(expectedKey);
+
+      // Get the expected value given the expected key
+      const expectedValue = expected.productionMap.get(expectedKey);
+
+      // Check if key exists in parseRules
+      expect(expectedValue).toBeDefined();
+
+      if (expectedValue) {
+        // Convert the Set to Array for easier comparison
+        const inputArray = Array.from(inputProductionMapValues.next().value);
+        const expectedArray = Array.from(expectedValue);
+
+        expect(inputArray).toEqual(expectedArray);
+      }
+    });
+  };
+
   it("returns correct output for matching pairs", () => {
-    const s = new Nonterminal("S");
-    const a = new Nonterminal("A");
-    const b = new Nonterminal("B");
+    const s = Nonterminal.make("S");
+    const a = Terminal.make("A");
+    const b = Terminal.make("B");
 
     const productionMapKeys = [s];
 
     const inputParseRules: ParseRules = translator(
-      input as unknown as Json
+      matchingPairs as unknown as Json
     ).parseRules;
 
     const parseRules: ParseRules = {
@@ -38,35 +74,57 @@ describe("Translator Test Suite", () => {
       ]),
     };
 
-    // Compare start
-    expect(inputParseRules.start).toEqual(parseRules.start);
+    checkInput(inputParseRules, parseRules, productionMapKeys);
+  });
 
-    // Compare productionMap
-    expect(inputParseRules.productionMap.size).toEqual(
-      parseRules.productionMap.size
-    );
+  it("returns correct output for well-formed parentheses", () => {
+    const s = Nonterminal.make("S");
+    const a = Terminal.make("A");
+    const b = Terminal.make("B");
 
-    const inputProductionMapKeys = inputParseRules.productionMap.keys();
-    const inputProductionMapValues = inputParseRules.productionMap.values();
+    const productionMapKeys = [s];
 
-    productionMapKeys.forEach((expectedKey) => {
-      // Check if key exists in inputParseRules and is the same as expectedKey
-      const inputKey = inputProductionMapKeys.next().value;
-      expect(inputKey).toEqual(expectedKey);
+    const inputParseRules: ParseRules = translator(
+      wellFormedParentheses as unknown as Json
+    ).parseRules;
 
-      // Get the expected value given the expected key
-      const expectedValue = parseRules.productionMap.get(expectedKey);
+    const parseRules: ParseRules = {
+      start: s,
+      productionMap: new Map([
+        [
+          productionMapKeys[0],
+          new Set([
+            {
+              label: "p",
+              elements: [
+                { label: undefined, symbol: s },
+                { label: undefined, symbol: s },
+              ],
+            },
+            {
+              label: "q",
+              elements: [
+                { label: undefined, symbol: a },
+                { label: undefined, symbol: s },
+                { label: undefined, symbol: b },
+              ],
+            },
+            {
+              label: "r",
+              elements: [
+                { label: undefined, symbol: a },
+                { label: undefined, symbol: b },
+              ],
+            },
+            {
+              label: "e",
+              elements: [],
+            },
+          ]),
+        ],
+      ]),
+    };
 
-      // Check if key exists in parseRules
-      expect(expectedValue).toBeDefined();
-
-      if (expectedValue) {
-        // Convert the Set to Array for easier comparison
-        const inputArray = Array.from(inputProductionMapValues.next().value);
-        const expectedArray = Array.from(expectedValue);
-
-        expect(inputArray).toEqual(expectedArray);
-      }
-    });
+    checkInput(inputParseRules, parseRules, productionMapKeys);
   });
 });

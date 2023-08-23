@@ -29,7 +29,7 @@ export const translator = (
   const whitespace = new RegExp(json.whitespace, "dy");
   const terminalRules: TerminalRule[] = json.terminalRules.map(
     (rule: [string, string]) => {
-      const terminal = new Terminal(rule[0]);
+      const terminal = Terminal.make(rule[0]);
       terminals.set(rule[0], terminal);
       return {
         terminal,
@@ -38,7 +38,7 @@ export const translator = (
     }
   );
 
-  const start = new Nonterminal(json.start);
+  const start = Nonterminal.make(json.start);
   nonterminals.set(json.start, start);
 
   const productionMap: Map<Nonterminal, Set<Rhs>> = new Map();
@@ -50,7 +50,7 @@ export const translator = (
         symbol:
           terminals.get(element) ||
           nonterminals.get(element) ||
-          new Nonterminal(element),
+          Nonterminal.make(element),
       };
     } else if (Array.isArray(element)) {
       return {
@@ -63,7 +63,7 @@ export const translator = (
 
   for (const [nonterminal, productions] of Object.entries(json.productionMap)) {
     const nonterm =
-      nonterminals.get(nonterminal) || new Nonterminal(nonterminal);
+      nonterminals.get(nonterminal) || Nonterminal.make(nonterminal);
     nonterminals.set(nonterminal, nonterm);
 
     const rhsSet: Set<Rhs> = new Set();

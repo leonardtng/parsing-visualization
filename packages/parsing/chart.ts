@@ -1,5 +1,5 @@
-import { ParseRules, Symbol } from "@/packages/grammar";
-import { Item, consume } from "@/packages/parsing";
+import { Nonterminal, ParseRules, Symbol, Terminal } from "@/packages/grammar";
+import { Item } from "@/packages/parsing";
 
 export class AutoMap<K, V> extends Map<K, V> {
   makeDefaultValue: () => V;
@@ -20,7 +20,7 @@ export class AutoMap<K, V> extends Map<K, V> {
 export const epsilonItems = (productionMap: ParseRules["productionMap"]) =>
   new Set(
     Array.from(productionMap).flatMap(([lhs, rhsSet]) =>
-      Array.from(rhsSet).flatMap((rhs) => ({ lhs, rhs, consumed: 0 }))
+      Array.from(rhsSet).flatMap((rhs) => Item.make(lhs, rhs, 0))
     )
   );
 
@@ -56,7 +56,7 @@ export class Chart {
 
   addItem(start: number, end: number, item: Item, split: number | undefined) {
     if (!this.items.get(start).get(end).get(item).has(split)) {
-      const consumed = consume(item);
+      const consumed = item.consume();
 
       if (!consumed) {
         this.addSymbol(start, end, item.lhs);
@@ -105,5 +105,53 @@ export class Chart {
     symbolList.forEach((symbol, index) => {
       this.addSymbol(start + index, start + index + 1, symbol);
     });
+  }
+
+  grid() {
+    const grid: (Symbol[] | null)[][] = Array(this.symbols.size)
+      .fill(null)
+      .map(() =>
+        Array(this.symbols.size)
+          .fill(null)
+          .map(() => [])
+      );
+
+    this.symbols.forEach((endMap, start) => {
+      endMap.forEach((symbols, end) => {
+        symbols.forEach((symbol) => {
+          grid[start][end]!.push(symbol);
+        });
+      });
+    });
+
+    return grid;
+  }
+
+  print() {
+    process.stdout.write("\n");
+    let maxSize = 0;
+    this.symbols.forEach((endMap) => {
+      endMap.forEach((_, end) => {
+        if (end > maxSize) {
+          maxSize = end;
+        }
+      });
+    });
+
+    const grid = this.grid();
+
+    for (let i = 0; i <= maxSize; i++) {
+      for (let j = 0; j <= maxSize; j++) {
+        const cell = grid[i][j];
+        const cellValue =
+          cell!.length > 0
+            ? cell!.map((s) => (s as Terminal | Nonterminal).name).join(",")
+            : " ";
+        process.stdout.write(`| ${cellValue} `);
+      }
+      process.stdout.write("|\n");
+      process.stdout.write("-".repeat((maxSize + 1) * 4 + 1));
+      process.stdout.write("\n");
+    }
   }
 }

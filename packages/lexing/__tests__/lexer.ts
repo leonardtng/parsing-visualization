@@ -8,10 +8,10 @@ describe("Lexer Test Suite", () => {
 
     const whitespace = /\s+/dy;
     const terminalRules: TerminalRule[] = [
-      { terminal: new Terminal("A"), regex: /A/dy },
-      { terminal: new Terminal("B"), regex: /B B/dy },
-      { terminal: new Terminal("X"), regex: /[A-Z]+/dy },
-      { terminal: new Terminal("Y"), regex: /\d+(\.\d+)?/dy },
+      { terminal: Terminal.make("A"), regex: /A/dy },
+      { terminal: Terminal.make("B"), regex: /B B/dy },
+      { terminal: Terminal.make("X"), regex: /[A-Z]+/dy },
+      { terminal: Terminal.make("Y"), regex: /\d+(\.\d+)?/dy },
     ];
 
     const lexRules: LexRules = { whitespace, terminalRules };
@@ -31,10 +31,10 @@ describe("Lexer Test Suite", () => {
       "The quick brown fox jumps over the lazy dog. If the dog barked, was it really lazy?";
     const whitespace = /\s+/dy;
     const terminalRules: TerminalRule[] = [
-      { terminal: new Terminal("WORD"), regex: /\b\w+\b/dy },
-      { terminal: new Terminal("COMMA"), regex: /,/dy },
-      { terminal: new Terminal("PUNCTUATION"), regex: /\./dy },
-      { terminal: new Terminal("QUESTION_MARK"), regex: /\?/dy },
+      { terminal: Terminal.make("WORD"), regex: /\b\w+\b/dy },
+      { terminal: Terminal.make("COMMA"), regex: /,/dy },
+      { terminal: Terminal.make("PUNCTUATION"), regex: /\./dy },
+      { terminal: Terminal.make("QUESTION_MARK"), regex: /\?/dy },
     ];
 
     const lexRules: LexRules = { whitespace, terminalRules };
