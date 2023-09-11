@@ -2,6 +2,7 @@ import { Nonterminal, ParseRules, Terminal } from "@/packages/grammar";
 import { Json, translator } from "@/packages/parsing";
 import matchingPairs from "./input/matching-pairs.json";
 import wellFormedParentheses from "./input/well-formed-parentheses.json";
+import squareBrackets from "./input/square-brackets.json";
 import "@testing-library/jest-dom";
 
 describe("Translator Test Suite", () => {
@@ -79,8 +80,8 @@ describe("Translator Test Suite", () => {
 
   it("returns correct output for well-formed parentheses", () => {
     const s = Nonterminal.make("S");
-    const a = Terminal.make("A");
-    const b = Terminal.make("B");
+    const a = Terminal.make("(");
+    const b = Terminal.make(")");
 
     const productionMapKeys = [s];
 
@@ -114,6 +115,74 @@ describe("Translator Test Suite", () => {
               elements: [
                 { label: undefined, symbol: a },
                 { label: undefined, symbol: b },
+              ],
+            },
+            {
+              label: "e",
+              elements: [],
+            },
+          ]),
+        ],
+      ]),
+    };
+
+    checkInput(inputParseRules, parseRules, productionMapKeys);
+  });
+
+  it("returns correct output for square parentheses", () => {
+    const s = Nonterminal.make("S");
+    const a = Terminal.make("(");
+    const b = Terminal.make(")");
+    const c = Terminal.make("[");
+    const d = Terminal.make("]");
+
+    const productionMapKeys = [s];
+
+    const inputParseRules: ParseRules = translator(
+      squareBrackets as unknown as Json
+    ).parseRules;
+
+    const parseRules: ParseRules = {
+      start: s,
+      productionMap: new Map([
+        [
+          productionMapKeys[0],
+          new Set([
+            {
+              label: "p",
+              elements: [
+                { label: undefined, symbol: s },
+                { label: undefined, symbol: s },
+              ],
+            },
+            {
+              label: "q",
+              elements: [
+                { label: undefined, symbol: a },
+                { label: undefined, symbol: s },
+                { label: undefined, symbol: b },
+              ],
+            },
+            {
+              label: "r",
+              elements: [
+                { label: undefined, symbol: a },
+                { label: undefined, symbol: b },
+              ],
+            },
+            {
+              label: "s",
+              elements: [
+                { label: undefined, symbol: c },
+                { label: undefined, symbol: s },
+                { label: undefined, symbol: d },
+              ],
+            },
+            {
+              label: "t",
+              elements: [
+                { label: undefined, symbol: c },
+                { label: undefined, symbol: d },
               ],
             },
             {
