@@ -1,0 +1,14 @@
+{
+  "start": "S",
+  "productionMap": {
+    "S": [
+      ["p", ["A", "S", "B"]],
+      ["e", []]
+    ]
+  },
+  "whitespace": "\\s+",
+  "terminalRules": [
+    ["A", "A"],
+    ["B", "B"]
+  ]
+}
