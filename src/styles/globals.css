@@ -16,10 +16,11 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-  * {
+  *:not(#editor):not(#editor *) {
     @apply font-primary;
   }
 }
+
 
 body {
   color: rgb(var(--foreground-rgb));

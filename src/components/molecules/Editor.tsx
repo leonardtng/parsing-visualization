@@ -53,6 +53,7 @@ const Editor = () => {
         name="editor"
         editorProps={{ $blockScrolling: true }}
         height="250px"
+        width="100%"
       />
     </div>
   );

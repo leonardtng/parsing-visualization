@@ -11,7 +11,7 @@ const LandingView = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 w-[500px]">
         <Editor />
         <Chart />
       </div>
