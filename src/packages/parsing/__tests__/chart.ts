@@ -60,7 +60,7 @@ describe("Chart Test Suite", () => {
       });
     });
 
-    chart.print();
+    // chart.print();
     const expectedOutput = [
       "0, 1, A",
       "0, 0, S",
@@ -143,7 +143,7 @@ describe("Chart Test Suite", () => {
       });
     });
 
-    chart.print();
+    // chart.print();
     const expectedOutput = [
       "0, 1, (",
       "0, 3, S",
@@ -209,7 +209,7 @@ describe("Chart Test Suite", () => {
       });
     });
 
-    chart.print();
+    // chart.print();
 
     const expectedOutput = [
       "0, 1, (",

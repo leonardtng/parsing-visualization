@@ -3,7 +3,7 @@ import { APPS } from "@/constants";
 
 export default function Home() {
   return (
-    <PageTemplate app={APPS.home} className="p-24">
+    <PageTemplate app={APPS.home}>
       <LandingView />
     </PageTemplate>
   );

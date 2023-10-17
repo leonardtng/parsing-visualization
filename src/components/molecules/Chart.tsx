@@ -3,18 +3,23 @@ import { useParsing } from "@/constants";
 import { Nonterminal, Terminal } from "@/packages";
 
 const Chart = () => {
-  const { chart } = useParsing();
+  const { grammar, chart } = useParsing();
 
   const grid = useMemo(() => chart?.grid() ?? [], [chart]);
   const gridSize = grid.length ?? 0;
 
   const finalSymbol = gridSize > 0 ? grid[0][gridSize - 1] : [];
-  const isComplete = finalSymbol?.length === 1;
+  const isComplete =
+    finalSymbol &&
+    finalSymbol.length >= 1 &&
+    finalSymbol
+      .map((cell) => (cell as Terminal | Nonterminal).name)
+      .includes(grammar.data.start);
 
   return (
-    <div className="w-full h-[300px] overflow-auto">
+    <div className="w-full h-full overflow-auto flex justify-center">
       <div
-        className="grid w-fit max-w-full"
+        className="grid w-fit max-w-full h-fit"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
         }}
@@ -23,28 +28,19 @@ const Chart = () => {
           row.map((col, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
-              className={`w-5 h-5 border 
+              className={`w-20 aspect-square border 
               flex justify-center items-center text-sm
               ${
                 rowIndex === 0 && colIndex === gridSize - 1
                   ? isComplete
-                    ? "border-success"
-                    : "border-error"
+                    ? "border-success text-success"
+                    : "border-error text-error"
                   : "border-fontPrimary"
-              }`}
+              } break-words overflow-auto no-scrollbar`}
             >
-              {col?.map((cell, cellIndex) => (
-                <span
-                  key={cellIndex}
-                  className={`${
-                    isComplete && rowIndex === 0 && colIndex === gridSize - 1
-                      ? "text-success"
-                      : ""
-                  }`}
-                >
-                  {(cell as Terminal | Nonterminal).name}
-                </span>
-              ))}
+              {col
+                ?.map((cell) => (cell as Terminal | Nonterminal).name)
+                .join(", ")}
             </div>
           ))
         )}

@@ -1,4 +1,34 @@
 /** @type {import('tailwindcss').Config} */
+
+const plugin = require("tailwindcss/plugin");
+
+const tailwindUtils = plugin(function ({ addUtilities }) {
+  addUtilities({
+    ".layout": {
+      maxWidth: "1250px",
+    },
+    ".layout-padding": {
+      paddingLeft: "8rem",
+      paddingRight: "8rem",
+    },
+    ".layout-padding-tablet": {
+      paddingLeft: "3rem",
+      paddingRight: "3rem",
+    },
+    ".layout-padding-mobile": {
+      paddingLeft: "1rem",
+      paddingRight: "1rem",
+    },
+    ".no-scrollbar": {
+      scrollbarWidth: "none" /* For Firefox */,
+      msOverflowStyle: "none" /* For Internet Explorer and Edge */,
+      "&::-webkit-scrollbar": {
+        display: "none" /* For Chrome, Safari and Opera */,
+      },
+    },
+  });
+});
+
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -34,5 +64,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [tailwindUtils],
 };

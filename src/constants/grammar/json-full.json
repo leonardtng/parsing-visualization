@@ -1,0 +1,59 @@
+{
+  "start": "JSON",
+  "productionMap": {
+    "JSON": [["a", ["element"]]],
+    "element": [["b", ["value"]]],
+    "value": [
+      ["c", ["object"]],
+      ["d", ["array"]],
+      ["p", ["string"]],
+      ["f", ["number"]],
+      ["g", ["true"]],
+      ["h", ["false"]],
+      ["i", ["null"]]
+    ],
+    "object": [
+      ["k", ["{", "members", "}"]],
+      ["j", ["{", "}"]]
+    ],
+    "members": [
+      ["m", ["member", ",", "members"]],
+      ["l", ["member"]]
+    ],
+    "member": [["n", ["string", ":", "element"]]],
+    "array": [
+      ["p", ["[", "elements", "]"]],
+      ["o", ["[", "]"]]
+    ],
+    "elements": [
+      ["r", ["element", ",", "elements"]],
+      ["q", ["element"]]
+    ],
+    "string": [["s", ["\"", "characters", "\""]]],
+    "characters": [
+      ["u", ["character", "characters"]],
+      ["e", []]
+    ],
+    "character": [
+      ["w", ["escape"]],
+      ["v", ["unicode"]]
+    ]
+  },
+  "whitespace": "\\s+",
+  "terminalRules": [
+    ["{", "\\{"],
+    ["}", "\\}"],
+    ["[", "\\["],
+    ["]", "\\]"],
+    [":", "\\:"],
+    [",", "\\,"],
+    ["\"", "\\\""],
+    ["\\", "\\\\"],
+    ["true", "true"],
+    ["false", "false"],
+    ["null", "null"],
+    ["escape", "(\\\\(\\\"|\\\\|/|b|f|n|r|t|u[0-9a-fA-F]{4}))"],
+    ["number", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
+    ["unicode", "[\u0020-\u10FFFF&&[^\"\\]]"]
+  ]
+}
