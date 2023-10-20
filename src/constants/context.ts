@@ -1,6 +1,6 @@
-import { Chart, Json } from "@/packages";
-import { Grammar, GrammarKey } from "@/types";
 import { createContext, useContext } from "react";
+import { Chart, Json, Symbol } from "@/packages";
+import { Grammar, GrammarKey } from "@/types";
 
 export interface ParsingContext {
   input: string;
@@ -9,6 +9,7 @@ export interface ParsingContext {
   selectGrammar: (grammar: Grammar) => void;
   grammarOptions: Grammar[];
   chart: Chart | null;
+  getDisplayedNode: (col: Symbol[] | null) => string;
 }
 
 export const ParsingContext = createContext<ParsingContext>({
@@ -22,6 +23,7 @@ export const ParsingContext = createContext<ParsingContext>({
   selectGrammar: () => {},
   grammarOptions: [],
   chart: null,
+  getDisplayedNode: () => "",
 });
 
 export const useParsing = () => useContext(ParsingContext);

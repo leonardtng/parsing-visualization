@@ -1,42 +1,41 @@
 {
   "start": "JSON",
   "productionMap": {
-    "JSON": [["a", ["element"]]],
-    "element": [["b", ["value"]]],
-    "value": [
-      ["c", ["object"]],
-      ["d", ["array"]],
-      ["p", ["string"]],
-      ["f", ["number"]],
-      ["g", ["true"]],
-      ["h", ["false"]],
+    "JSON": [["a", ["elem"]]],
+    "elem": [["b", ["val"]]],
+    "val": [
+      ["c", ["obj"]],
+      ["d", ["arr"]],
+      ["p", ["str"]],
+      ["f", ["num"]],
+      ["g", ["bool"]],
       ["i", ["null"]]
     ],
-    "object": [
-      ["k", ["{", "members", "}"]],
+    "obj": [
+      ["k", ["{", "mems", "}"]],
       ["j", ["{", "}"]]
     ],
-    "members": [
-      ["m", ["member", ",", "members"]],
-      ["l", ["member"]]
+    "mems": [
+      ["m", ["mem", ",", "mems"]],
+      ["l", ["mem"]]
     ],
-    "member": [["n", ["string", ":", "element"]]],
-    "array": [
-      ["p", ["[", "elements", "]"]],
+    "mem": [["n", ["str", ":", "elem"]]],
+    "arr": [
+      ["p", ["[", "elems", "]"]],
       ["o", ["[", "]"]]
     ],
-    "elements": [
-      ["r", ["element", ",", "elements"]],
-      ["q", ["element"]]
+    "elems": [
+      ["r", ["elem", ",", "elems"]],
+      ["q", ["elem"]]
     ],
-    "string": [["s", ["\"", "characters", "\""]]],
-    "characters": [
-      ["u", ["character", "characters"]],
+    "str": [["s", ["\"", "chars", "\""]]],
+    "chars": [
+      ["u", ["char", "chars"]],
       ["e", []]
     ],
-    "character": [
-      ["w", ["escape"]],
-      ["v", ["unicode"]]
+    "char": [
+      ["w", ["esc"]],
+      ["v", ["uni"]]
     ]
   },
   "whitespace": "\\s+",
@@ -49,11 +48,10 @@
     [",", "\\,"],
     ["\"", "\\\""],
     ["\\", "\\\\"],
-    ["true", "true"],
-    ["false", "false"],
+    ["bool", "(true|false)"],
     ["null", "null"],
-    ["escape", "(\\\\(\\\"|\\\\|/|b|f|n|r|t|u[0-9a-fA-F]{4}))"],
-    ["number", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
-    ["unicode", "[\u0020-\u10FFFF&&[^\"\\]]"]
+    ["esc", "(\\\\(\\\"|\\\\|/|b|f|n|r|t|u[0-9a-fA-F]{4}))"],
+    ["num", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
+    ["uni", "[\u0020-\u10FFFF&&[^\"\\]]"]
   ]
 }

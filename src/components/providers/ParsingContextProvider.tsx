@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import debounce from "lodash/debounce";
-import { Chart, parser } from "@/packages";
+import { Chart, Nonterminal, Symbol, Terminal, parser } from "@/packages";
 import { GRAMMARS, ParsingContext } from "@/constants";
 import { Grammar } from "@/types";
 
@@ -44,6 +44,29 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
     debouncedParse();
   }, [debouncedParse]);
 
+  const mapKeys = useMemo(
+    () => Object.keys(grammar.data.productionMap),
+    [grammar.data.productionMap]
+  );
+
+  const getDisplayedNode = useCallback(
+    (col: Symbol[] | null): string => {
+      if (!col) return "";
+      if (col.length === 1) return (col[0] as Terminal | Nonterminal).name;
+
+      const names = col.map((cell) => (cell as Terminal | Nonterminal).name);
+
+      for (const node of mapKeys) {
+        if (names.includes(node)) {
+          return node;
+        }
+      }
+
+      return "";
+    },
+    [mapKeys]
+  );
+
   return (
     <ParsingContext.Provider
       value={{
@@ -53,6 +76,7 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
         selectGrammar,
         grammarOptions,
         chart,
+        getDisplayedNode,
       }}
     >
       {children}
