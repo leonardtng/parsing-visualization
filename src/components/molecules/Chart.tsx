@@ -3,7 +3,7 @@ import { useParsing } from "@/constants";
 import { Nonterminal, Terminal } from "@/packages";
 
 const Chart = () => {
-  const { grammar, chart, getDisplayedNode } = useParsing();
+  const { grammar, chart, getDisplayedNode, showMostRelevant } = useParsing();
 
   const grid = useMemo(() => chart?.grid() ?? [], [chart]);
   const gridSize = grid.length ?? 0;
@@ -28,7 +28,9 @@ const Chart = () => {
           row.map((col, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
-              className={`w-10 aspect-square border 
+              className={`${
+                showMostRelevant ? "w-10" : "w-16"
+              } aspect-square border 
               flex justify-center items-center text-[11px]
               ${
                 rowIndex === 0 && colIndex === gridSize - 1
@@ -38,12 +40,13 @@ const Chart = () => {
                   : "border-fontPrimary"
               } break-words overflow-auto no-scrollbar`}
             >
-              {rowIndex === 0 && colIndex === gridSize - 1
-                ? getDisplayedNode(col)
-                : (col?.[0] as Terminal | Nonterminal)?.name}
-              {/* {col
-                ?.map((cell) => (cell as Terminal | Nonterminal).name)
-                .join(", ")} */}
+              {showMostRelevant
+                ? rowIndex === 0 && colIndex === gridSize - 1
+                  ? getDisplayedNode(col)
+                  : (col?.[0] as Terminal | Nonterminal)?.name
+                : col
+                    ?.map((cell) => (cell as Terminal | Nonterminal).name)
+                    .join(", ")}
             </div>
           ))
         )}

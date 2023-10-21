@@ -45,6 +45,11 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
     [mapKeys]
   );
 
+  const [showMostRelevant, setShowMostRelevant] = useState<boolean>(true);
+  const toggleShowMostRelevant = () => {
+    setShowMostRelevant((prev) => !prev);
+  };
+
   return (
     <ParsingContext.Provider
       value={{
@@ -55,6 +60,8 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
         grammarOptions,
         chart,
         getDisplayedNode,
+        showMostRelevant,
+        toggleShowMostRelevant,
       }}
     >
       {children}
