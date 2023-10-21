@@ -26,6 +26,29 @@ describe("Lexer Test Suite", () => {
     expect(tokenString).toBe("ABXYY");
   });
 
+  it("returns correct output for square brackets", () => {
+    const paragraph = "[()()]";
+
+    const whitespace = /\s+/dy;
+    const terminalRules: TerminalRule[] = [
+      { terminal: Terminal.make("["), regex: /\[/dy },
+      { terminal: Terminal.make("]"), regex: /\]/dy },
+      { terminal: Terminal.make("("), regex: /\(/dy },
+      { terminal: Terminal.make(")"), regex: /\)/dy },
+    ];
+
+    const lexRules: LexRules = { whitespace, terminalRules };
+
+    const { position, tokens } = lexer(lexRules, paragraph);
+
+    const tokenString = tokens
+      .map((token: Token) => token.terminal.name)
+      .join("");
+
+    expect(position).toBe(6);
+    expect(tokenString).toBe("[()()]");
+  });
+
   it("passes prose test", () => {
     const paragraph =
       "The quick brown fox jumps over the lazy dog. If the dog barked, was it really lazy?";

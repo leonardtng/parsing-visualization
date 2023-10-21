@@ -14,18 +14,20 @@ export interface Json {
   };
   whitespace: string;
   terminalRules: [string, string][];
+  directory?: { [key: string]: string };
 }
 
-export const translator = (
-  json: Json
-): {
+export interface TranslatorOutput {
   parseRules: ParseRules;
   whitespace: RegExp;
   terminalRules: TerminalRule[];
-} => {
+  directory?: { [key: string]: string };
+}
+
+export const translator = (json: Json): TranslatorOutput => {
   const terminals: Map<string, Terminal> = new Map();
   const nonterminals: Map<string, Nonterminal> = new Map();
-
+  console.log("translator");
   const whitespace = new RegExp(json.whitespace, "dy");
   const terminalRules: TerminalRule[] = json.terminalRules.map(
     (rule: [string, string]) => {
@@ -86,5 +88,6 @@ export const translator = (
     },
     whitespace,
     terminalRules,
+    directory: json.directory,
   };
 };

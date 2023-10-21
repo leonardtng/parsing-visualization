@@ -38,6 +38,21 @@
       ["v", ["uni"]]
     ]
   },
+  "directory": {
+    "JSON": "JSON",
+    "elem": "element",
+    "val": "value",
+    "obj": "object",
+    "mems": "members",
+    "mem": "member",
+    "arr": "array",
+    "elems": "elements",
+    "str": "string",
+    "chars": "characters",
+    "char": "character",
+    "esc": "escape",
+    "uni": "unicode"
+  },
   "whitespace": "\\s+",
   "terminalRules": [
     ["{", "\\{"],

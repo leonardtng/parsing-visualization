@@ -1,15 +1,8 @@
-import React, {
-  FC,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import debounce from "lodash/debounce";
-import { Chart, Nonterminal, Symbol, Terminal, parser } from "@/packages";
+import React, { FC, ReactNode, useCallback, useMemo, useState } from "react";
+import { Nonterminal, Symbol, Terminal } from "@/packages";
 import { GRAMMARS, ParsingContext } from "@/constants";
 import { Grammar } from "@/types";
+import { useParser } from "@/helpers/parsing";
 
 interface Props {
   children?: ReactNode;
@@ -19,7 +12,7 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
   const [input, setInput] = useState<string>("");
   const [grammar, setGrammar] = useState<Grammar>(GRAMMARS[0]);
   const grammarOptions = useMemo(() => GRAMMARS, []);
-  const [chart, setChart] = useState<Chart | null>(null);
+  const { chart, directory } = useParser(grammar, input);
 
   const onInputChange = (input: string) => {
     setInput(input);
@@ -28,21 +21,6 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
   const selectGrammar = (grammar: Grammar) => {
     setGrammar(grammar);
   };
-
-  const parse = useCallback(() => {
-    if (input && grammar) {
-      const chart = parser(input, grammar.data);
-      setChart(chart);
-    } else {
-      setChart(null);
-    }
-  }, [grammar, input]);
-
-  const debouncedParse = useMemo(() => debounce(parse, 500), [parse]);
-
-  useEffect(() => {
-    debouncedParse();
-  }, [debouncedParse]);
 
   const mapKeys = useMemo(
     () => Object.keys(grammar.data.productionMap),
