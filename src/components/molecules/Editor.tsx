@@ -46,7 +46,7 @@ const Editor = () => {
   const { onInputChange } = useContext(ParsingContext);
 
   return (
-    <div className="w-[500px]">
+    <div className="w-full max-w-[500px]">
       <AceEditor
         theme="monokai"
         onChange={onInputChange}

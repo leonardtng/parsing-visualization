@@ -3,7 +3,7 @@ import { Chart, Editor, GrammarSelector } from "@/components";
 
 const LandingView = () => {
   return (
-    <div className="w-full h-screen flex flex-col items-center gap-8 md:gap-12 pt-12 px-3 pb-3 md:p-24 overflow-hidden">
+    <div className="w-full h-screen flex flex-col items-center gap-8 md:gap-12 pt-12 px-3 pb-8 md:p-24 overflow-hidden">
       <div className="flex flex-col gap-3 items-center">
         <div className="font-bold text-xl">Parsing Visualization</div>
         <div>
