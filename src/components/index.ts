@@ -9,6 +9,7 @@ export * from "./atoms/Tooltip";
 export { default as Chart } from "./molecules/Chart";
 export { default as Editor } from "./molecules/Editor";
 export { default as GrammarSelector } from "./molecules/GrammarSelector";
+export { default as ProductionMapDrawer } from "./molecules/ProductionMapDrawer";
 
 // Organisms
 export { default as LandingView } from "./organisms/LandingView";

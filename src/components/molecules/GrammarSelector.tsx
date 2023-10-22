@@ -24,6 +24,7 @@ const GrammarSelector = () => {
         options={grammarOptions}
         value={grammar.key}
         onChange={handleChange}
+        customLabel={`Grammar: ${grammar.label}`}
       />
 
       <div
