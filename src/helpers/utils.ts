@@ -1,4 +1,12 @@
-import { RefObject, SyntheticEvent, useEffect, useMemo, useState } from "react";
+import {
+  RefObject,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAnalyzeParse } from "@/helpers";
 
 /**
@@ -141,6 +149,82 @@ export const useOutsideAlerter = (
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [ref, callback]);
+};
+
+interface ScrollShadowOptions {
+  deps?: unknown[];
+}
+
+/**
+ * Hook that manages scroll shadow states.
+ *
+ * @param options.transformScroll if true, will transform vertical scroll mapping to be horizontal
+ * @param options.orientation "horizontal" or "vertical" scroll shadow
+ *
+ * @returns containerProps for scrolling container, states for start and end shadows
+ */
+export const useScrollShadow = (options?: ScrollShadowOptions) => {
+  const { deps } = options ?? {};
+
+  const [displayShadowStartY, setDisplayShadowStartY] =
+    useState<boolean>(false);
+  const [displayShadowEndY, setDisplayShadowEndY] = useState<boolean>(false);
+  const [displayShadowStartX, setDisplayShadowStartX] =
+    useState<boolean>(false);
+  const [displayShadowEndX, setDisplayShadowEndX] = useState<boolean>(false);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [scrollPositionY, setScrollPositionY] = useState(0);
+  const [scrollPositionX, setScrollPositionX] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    if (containerRef.current) {
+      const startY = containerRef.current?.scrollTop;
+      const startX = containerRef.current?.scrollLeft;
+
+      const clientMaximumY = containerRef?.current?.clientHeight;
+      const clientMaximumX = containerRef?.current?.clientWidth;
+
+      const scrollMaximumY = containerRef?.current?.scrollHeight;
+      const scrollMaximumX = containerRef?.current?.scrollWidth;
+
+      const atStartY = startY < 10;
+      const atStartX = startX < 10;
+
+      const reachedEndY = scrollMaximumY - startY - 10 < clientMaximumY;
+      const reachedEndX = scrollMaximumX - startX - 10 < clientMaximumX;
+
+      const needScrollY = clientMaximumY < scrollMaximumY;
+      const needScrollX = clientMaximumX < scrollMaximumX;
+
+      setDisplayShadowStartY(Boolean(needScrollY && !atStartY));
+      setDisplayShadowEndY(Boolean(needScrollY && !reachedEndY));
+
+      setDisplayShadowStartX(Boolean(needScrollX && !atStartX));
+      setDisplayShadowEndX(Boolean(needScrollX && !reachedEndX));
+
+      const scrollPositionY = containerRef.current?.scrollTop;
+      const scrollPositionX = containerRef.current?.scrollLeft;
+
+      setScrollPositionY(scrollPositionY);
+      setScrollPositionX(scrollPositionX);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef.current, deps]);
+
+  useEffect(() => {
+    handleScroll();
+  }, [handleScroll]);
+
+  return {
+    scrollContainerProps: { ref: containerRef, onScroll: handleScroll },
+    scrollPositionY,
+    displayShadowStartY,
+    displayShadowEndY,
+    scrollPositionX,
+    displayShadowStartX,
+    displayShadowEndX,
+  };
 };
 
 export const getTierEffect = (tier: number, isWeb: boolean) => {

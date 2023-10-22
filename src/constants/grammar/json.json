@@ -50,7 +50,9 @@
     "str": "string",
     "chars": "characters",
     "char": "character",
+    "bool": "boolean",
     "esc": "escape",
+    "num": "number",
     "uni": "unicode"
   },
   "whitespace": "\\s+",

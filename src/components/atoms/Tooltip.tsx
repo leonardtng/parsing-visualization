@@ -61,7 +61,7 @@ export const Tooltip: FC<TooltipProps> = ({
           ref={tooltipRef}
           className={`tooltipBase ${
             tooltipProps?.className
-          } absolute flex items-center text-sm z-50 
+          } fixed flex items-center text-sm z-50 
             px-2 bg-backgroundPaper dark:bg-darkBackgroundPaper rounded-lg shadow-lg ${
               tooltipInit ? "" : "hidden"
             }`}
