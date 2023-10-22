@@ -1,11 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import Draggable, {
-  DraggableCore,
-  DraggableData,
-  DraggableEvent,
-  DraggableEventHandler,
-} from "react-draggable";
+import Draggable from "react-draggable";
 import { FaArrowRight, FaMap, FaMinus } from "react-icons/fa";
 import { useParsingContext } from "@/constants";
 import { useScrollShadow } from "@/helpers";
@@ -19,6 +14,7 @@ const ProductionMapDrawer = () => {
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
   const [dragging, setDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<boolean>(false);
+
   const { scrollContainerProps, displayShadowStartY, displayShadowEndY } =
     useScrollShadow();
 
@@ -96,12 +92,22 @@ const ProductionMapDrawer = () => {
                   >
                     <div className="flex items-center gap-2">
                       <div>{key}</div>
+                      {/* <div>{directory?.[key] ?? key}</div> */}
                       <FaArrowRight />
                     </div>
                     <div className="text-end">
                       {value.map(([label, items], index) => (
                         <div key={index}>
                           {label === "e" ? '""' : items.join(" ")}
+                          {/* {label === "e"
+                            ? '""'
+                            : items
+                                .map((item) =>
+                                  typeof item === "string"
+                                    ? directory?.[item] ?? item
+                                    : items
+                                )
+                                .join(" ")} */}
                         </div>
                       ))}
                     </div>
