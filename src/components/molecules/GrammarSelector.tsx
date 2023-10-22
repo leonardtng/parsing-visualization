@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from "react";
 import { Checkbox, Select } from "@/components";
-import { useParsing } from "@/constants";
+import { useParsingContext } from "@/constants";
 
 const GrammarSelector = () => {
   const {
@@ -9,7 +9,7 @@ const GrammarSelector = () => {
     grammarOptions,
     showMostRelevant,
     toggleShowMostRelevant,
-  } = useParsing();
+  } = useParsingContext();
 
   const handleChange = (_: SyntheticEvent | null, selected: string) => {
     selectGrammar(

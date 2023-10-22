@@ -30,4 +30,4 @@ export const ParsingContext = createContext<ParsingContext>({
   toggleShowMostRelevant: () => {},
 });
 
-export const useParsing = () => useContext(ParsingContext);
+export const useParsingContext = () => useContext(ParsingContext);

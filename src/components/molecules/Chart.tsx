@@ -1,25 +1,20 @@
-import React, { useMemo } from "react";
-import { useParsing } from "@/constants";
+import React from "react";
+import { motion } from "framer-motion";
+import { useParsingContext } from "@/constants";
 import { Nonterminal, Terminal } from "@/packages";
+import { useTieredEffect, useWindowSize } from "@/helpers";
+import { useAnalyzeParse } from "@/helpers/parsing";
 
 const Chart = () => {
-  const { grammar, chart, getDisplayedNode, showMostRelevant } = useParsing();
-
-  const grid = useMemo(() => chart?.grid() ?? [], [chart]);
-  const gridSize = grid.length ?? 0;
-
-  const finalSymbol = gridSize > 0 ? grid[0][gridSize - 1] : [];
-  const isComplete =
-    finalSymbol &&
-    finalSymbol.length >= 1 &&
-    finalSymbol
-      .map((cell) => (cell as Terminal | Nonterminal).name)
-      .includes(grammar.data.start);
+  const [winWidth, winHeight] = useWindowSize();
+  const { getDisplayedNode, showMostRelevant } = useParsingContext();
+  const { isComplete, grid, gridSize } = useAnalyzeParse();
+  const { shadowStyles } = useTieredEffect();
 
   return (
-    <div className="w-full h-full overflow-auto flex justify-center">
+    <div className="w-full h-full overflow-auto flex justify-center z-0">
       <div
-        className="grid w-fit max-w-full h-fit"
+        className="grid w-fit max-w-full h-fit z-10"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
         }}
@@ -51,6 +46,19 @@ const Chart = () => {
           ))
         )}
       </div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1 }}
+        className="fixed rounded-full bg-background z-0"
+        style={{
+          top: winHeight + 60,
+          width: winWidth,
+          height: winWidth,
+          ...shadowStyles,
+        }}
+      />
     </div>
   );
 };

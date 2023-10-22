@@ -1,7 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import debounce from "lodash/debounce";
-import { Chart, generateChart, lexer, translator } from "@/packages";
+import {
+  Chart,
+  Nonterminal,
+  Terminal,
+  generateChart,
+  lexer,
+  translator,
+} from "@/packages";
 import { Grammar } from "@/types";
+import { useParsingContext } from "@/constants";
 
 export const useParser = (grammar: Grammar, input: string) => {
   const [chart, setChart] = useState<Chart | null>(null);
@@ -31,4 +39,21 @@ export const useParser = (grammar: Grammar, input: string) => {
   }, [debouncedParse]);
 
   return { chart, directory };
+};
+
+export const useAnalyzeParse = () => {
+  const { grammar, chart } = useParsingContext();
+  const grid = useMemo(() => chart?.grid() ?? [], [chart]);
+  const gridSize = grid.length ?? 0;
+
+  const finalSymbol = gridSize > 0 ? grid[0][gridSize - 1] : [];
+  const isComplete = Boolean(
+    finalSymbol &&
+      finalSymbol.length >= 1 &&
+      finalSymbol
+        .map((cell) => (cell as Terminal | Nonterminal).name)
+        .includes(grammar.data.start)
+  );
+
+  return { isComplete, grid, gridSize };
 };
