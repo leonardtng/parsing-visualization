@@ -1,15 +1,40 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Tooltip } from "@/components";
 import { useParsingContext } from "@/constants";
-import { Nonterminal, Terminal } from "@/packages";
+import { Nonterminal, Symbol, Terminal } from "@/packages";
 import { useTieredEffect, useWindowSize } from "@/helpers";
 import { useAnalyzeParse } from "@/helpers/parsing";
 
 const Chart = () => {
   const [winWidth, winHeight] = useWindowSize();
-  const { getDisplayedNode, showMostRelevant } = useParsingContext();
+  const { directory, getDisplayedNode, showMostRelevant } = useParsingContext();
   const { isComplete, grid, gridSize } = useAnalyzeParse();
   const { shadowStyles } = useTieredEffect();
+
+  const getCellData = (
+    col: Symbol[] | null,
+    rowIndex: number,
+    colIndex: number
+  ) => {
+    if (showMostRelevant) {
+      if (rowIndex === 0 && colIndex === gridSize - 1) {
+        const cell = getDisplayedNode(col);
+
+        return { cell, tooltip: directory?.[cell] };
+      } else {
+        const cell = (col?.[0] as Terminal | Nonterminal)?.name;
+
+        return { cell, tooltip: directory?.[cell] };
+      }
+    } else {
+      const cell = col?.map((cell) => (cell as Terminal | Nonterminal).name);
+      return {
+        cell: cell?.join(", "),
+        tooltip: cell?.map((content) => directory?.[content]).join(", "),
+      };
+    }
+  };
 
   return (
     <div className="w-full h-full overflow-auto flex justify-center z-0">
@@ -20,12 +45,22 @@ const Chart = () => {
         }}
       >
         {grid?.map((row, rowIndex) =>
-          row.map((col, colIndex) => (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              className={`${
-                showMostRelevant ? "w-10" : "w-16"
-              } aspect-square border 
+          row.map((col, colIndex) => {
+            const { cell, tooltip } = getCellData(col, rowIndex, colIndex);
+
+            return (
+              <Tooltip
+                key={`${rowIndex}-${colIndex}`}
+                data={tooltip}
+                disabled={!Boolean(tooltip)}
+                tooltipProps={{
+                  className: "bg-primary",
+                }}
+              >
+                <div
+                  className={`${
+                    showMostRelevant ? "w-10" : "w-16"
+                  } aspect-square border 
               flex justify-center items-center text-[11px]
               ${
                 rowIndex === 0 && colIndex === gridSize - 1
@@ -34,16 +69,12 @@ const Chart = () => {
                     : "border-error text-error"
                   : "border-fontPrimary"
               } break-words overflow-auto no-scrollbar`}
-            >
-              {showMostRelevant
-                ? rowIndex === 0 && colIndex === gridSize - 1
-                  ? getDisplayedNode(col)
-                  : (col?.[0] as Terminal | Nonterminal)?.name
-                : col
-                    ?.map((cell) => (cell as Terminal | Nonterminal).name)
-                    .join(", ")}
-            </div>
-          ))
+                >
+                  {cell}
+                </div>
+              </Tooltip>
+            );
+          })
         )}
       </div>
 

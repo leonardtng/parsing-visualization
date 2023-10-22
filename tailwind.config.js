@@ -41,7 +41,7 @@ module.exports = {
         primary: ['"Figtree"', "sans-serif"],
       },
       colors: {
-        primary: "#37B875",
+        primary: "#2C77F4",
 
         // backgrounds
         background: "#121212",

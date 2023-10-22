@@ -59,6 +59,7 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
         selectGrammar,
         grammarOptions,
         chart,
+        directory,
         getDisplayedNode,
         showMostRelevant,
         toggleShowMostRelevant,

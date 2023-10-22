@@ -9,6 +9,7 @@ export interface ParsingContext {
   selectGrammar: (grammar: Grammar) => void;
   grammarOptions: Grammar[];
   chart: Chart | null;
+  directory: { [key: string]: string } | undefined;
   getDisplayedNode: (col: Symbol[] | null) => string;
   showMostRelevant: boolean;
   toggleShowMostRelevant: () => void;
@@ -25,6 +26,7 @@ export const ParsingContext = createContext<ParsingContext>({
   selectGrammar: () => {},
   grammarOptions: [],
   chart: null,
+  directory: undefined,
   getDisplayedNode: () => "",
   showMostRelevant: true,
   toggleShowMostRelevant: () => {},

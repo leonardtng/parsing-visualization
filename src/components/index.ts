@@ -3,6 +3,7 @@ export * from "./atoms/ArrowToggle";
 export * from "./atoms/Checkbox";
 export * from "./atoms/CircularProgress";
 export * from "./atoms/Select";
+export * from "./atoms/Tooltip";
 
 // Molecules
 export { default as Chart } from "./molecules/Chart";
