@@ -45,7 +45,7 @@ export const translator = (json: Json): TranslatorOutput => {
 
   const productionMap: Map<Nonterminal, Set<Rhs>> = new Map();
 
-  const parseElement = (element: any): RhsElement => {
+  const parseElement = (element: unknown): RhsElement => {
     if (typeof element === "string") {
       return {
         label: undefined,
