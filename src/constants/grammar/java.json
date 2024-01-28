@@ -37,7 +37,17 @@
       ["t", ["RtS"]],
       ["u", ["E", ";"]]
     ],
-    "IfS": [["v", ["if", "(", "E", ")", "S"]]],
+    "IfS": [
+      ["v", ["if", "(", "E", ")", "S"]],
+      ["w", ["if", "(", "E", ")", "{", "MB", "}", "ElseS"]],
+      ["x", ["if", "(", "E", ")", "S", "ElseS"]]
+    ],
+    "ElseS": [
+      ["y", ["else", "S"]],
+      ["z", ["else", "{", "MB", "}"]],
+      ["aa", ["else", "IfS"]],
+      ["aa", []]
+    ],
     "WhS": [["w", ["while", "(", "E", ")", "S"]]],
     "RtS": [["x", ["return", "E", ";"]]],
     "E": [
@@ -73,6 +83,7 @@
     "MB": "MethodBody",
     "S": "Statement",
     "IfS": "IfStatement",
+    "ElseS": "ElseStatement",
     "WhS": "WhileStatement",
     "RtS": "ReturnStatement",
     "E": "Expression",
@@ -106,6 +117,7 @@
     ["class", "class"],
     ["bool", "(true|false)"],
     ["if", "if"],
+    ["else", "else"],
     ["while", "while"],
     ["return", "return"],
     ["num", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
