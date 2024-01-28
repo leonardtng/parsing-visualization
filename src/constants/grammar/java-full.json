@@ -1,0 +1,98 @@
+{
+  "start": "ClassDeclaration",
+  "productionMap": {
+    "ClassDeclaration": [
+      ["a", ["AccessModifier", "Class", "Identifier", "{", "ClassBody", "}"]]
+    ],
+    "Class": [["a", ["class"]]],
+    "AccessModifier": [
+      ["b", ["public"]],
+      ["c", ["private"]],
+      ["d", ["protected"]],
+      ["e", []]
+    ],
+    "ClassBody": [
+      ["f", ["MemberDeclaration", "ClassBody"]],
+      ["g", []]
+    ],
+    "MemberDeclaration": [
+      ["h", ["VariableDeclaration"]],
+      ["i", ["MethodDeclaration"]]
+    ],
+    "VariableDeclaration": [["j", ["Type", "Identifier", ";"]]],
+    "MethodDeclaration": [
+      [
+        "k",
+        [
+          "AccessModifier",
+          "Type",
+          "Identifier",
+          "(",
+          "ParameterList",
+          ")",
+          "{",
+          "MethodBody",
+          "}"
+        ]
+      ]
+    ],
+    "ParameterList": [
+      ["l", ["Parameter", ",", "ParameterList"]],
+      ["m", ["Parameter"]],
+      ["n", []]
+    ],
+    "Parameter": [["o", ["Type", "Identifier"]]],
+    "MethodBody": [
+      ["p", ["Statement", "MethodBody"]],
+      ["q", []]
+    ],
+    "Statement": [
+      ["r", ["IfStatement"]],
+      ["s", ["WhileStatement"]],
+      ["t", ["ReturnStatement"]],
+      ["u", ["Expression", ";"]]
+    ],
+    "IfStatement": [["v", ["if", "(", "Expression", ")", "Statement"]]],
+    "WhileStatement": [["w", ["while", "(", "Expression", ")", "Statement"]]],
+    "ReturnStatement": [["x", ["return", "Expression", ";"]]],
+    "Expression": [
+      ["y", ["Identifier", "=", "Expression"]],
+      ["z", ["Literal"]],
+      ["aa", ["Identifier"]]
+    ],
+    "Type": [
+      ["ab", ["int"]],
+      ["ac", ["boolean"]],
+      ["ad", ["void"]],
+      ["ae", ["Identifier"]]
+    ],
+    "Literal": [
+      ["af", ["NumberLiteral"]],
+      ["ag", ["StringLiteral"]],
+      ["ah", ["BooleanLiteral"]]
+    ],
+    "Identifier": [["ai", ["chars"]]],
+    "NumberLiteral": [["aj", ["num"]]],
+    "StringLiteral": [["ak", ["\"", "chars", "\""]]],
+    "BooleanLiteral": [
+      ["al", ["true"]],
+      ["am", ["false"]]
+    ]
+  },
+  "whitespace": "\\s+",
+  "terminalRules": [
+    ["{", "\\{"],
+    ["}", "\\}"],
+    ["[", "\\["],
+    ["]", "\\]"],
+    ["(", "\\("],
+    [")", "\\)"],
+    [":", "\\:"],
+    [",", "\\,"],
+    [";", "\\;"],
+    ["\"", "\\\""],
+    ["\\", "\\\\"],
+    ["num", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
+    ["chars", "[a-zA-Z_][a-zA-Z0-9_]*"]
+  ]
+}

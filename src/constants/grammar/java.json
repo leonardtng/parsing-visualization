@@ -1,0 +1,114 @@
+{
+  "start": "CD",
+  "productionMap": {
+    "chars": [
+      ["u", ["chars"]],
+      ["e", []]
+    ],
+    "CD": [["a", ["AM", "class", "ID", "{", "CB", "}"]]],
+    "AM": [
+      ["b", ["public"]],
+      ["c", ["private"]],
+      ["d", ["protected"]]
+    ],
+    "CB": [
+      ["f", ["MD", "CB"]],
+      ["g", []]
+    ],
+    "MD": [
+      ["h", ["VD"]],
+      ["i", ["MthD"]]
+    ],
+    "VD": [["j", ["Ty", "ID", ";"]]],
+    "MthD": [["k", ["AM", "Ty", "ID", "(", "PL", ")", "{", "MB", "}"]]],
+    "PL": [
+      ["l", ["P", ",", "PL"]],
+      ["m", ["P"]],
+      ["e", []]
+    ],
+    "P": [["o", ["Ty", "ID"]]],
+    "MB": [
+      ["p", ["S", "MB"]],
+      ["q", []]
+    ],
+    "S": [
+      ["r", ["IfS"]],
+      ["s", ["WhS"]],
+      ["t", ["RtS"]],
+      ["u", ["E", ";"]]
+    ],
+    "IfS": [["v", ["if", "(", "E", ")", "S"]]],
+    "WhS": [["w", ["while", "(", "E", ")", "S"]]],
+    "RtS": [["x", ["return", "E", ";"]]],
+    "E": [
+      ["y", ["ID", "=", "E"]],
+      ["z", ["L"]],
+      ["aa", ["ID"]]
+    ],
+    "Ty": [
+      ["ab", ["int"]],
+      ["ac", ["boolean"]],
+      ["ad", ["void"]],
+      ["ae", ["ID"]]
+    ],
+    "L": [
+      ["af", ["NL"]],
+      ["ag", ["SL"]],
+      ["ah", ["BL"]]
+    ],
+    "ID": [["ai", ["chars"]]],
+    "NL": [["aj", ["num"]]],
+    "SL": [["ak", ["\"", "chars", "\""]]],
+    "BL": [["al", ["bool"]]]
+  },
+  "directory": {
+    "CD": "ClassDeclaration",
+    "AM": "AccessModifier",
+    "CB": "ClassBody",
+    "MD": "MemberDeclaration",
+    "VD": "VariableDeclaration",
+    "MthD": "MethodDeclaration",
+    "PL": "ParameterList",
+    "P": "Parameter",
+    "MB": "MethodBody",
+    "S": "Statement",
+    "IfS": "IfStatement",
+    "WhS": "WhileStatement",
+    "RtS": "ReturnStatement",
+    "E": "Expression",
+    "Ty": "Type",
+    "L": "Literal",
+    "ID": "Identifier",
+    "NL": "NumberLiteral",
+    "SL": "StringLiteral",
+    "BL": "BooleanLiteral"
+  },
+  "whitespace": "\\s+",
+  "terminalRules": [
+    ["=", "\\="],
+    ["{", "\\{"],
+    ["}", "\\}"],
+    ["[", "\\["],
+    ["]", "\\]"],
+    ["(", "\\("],
+    [")", "\\)"],
+    [":", "\\:"],
+    [",", "\\,"],
+    [";", "\\;"],
+    ["\"", "\\\""],
+    ["\\", "\\\\"],
+    ["public", "public"],
+    ["private", "private"],
+    ["protected", "protected"],
+    ["int", "int"],
+    ["void", "void"],
+    ["boolean", "boolean"],
+    ["class", "class"],
+    ["bool", "(true|false)"],
+    ["if", "if"],
+    ["while", "while"],
+    ["return", "return"],
+    ["num", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
+    ["chars", "[a-zA-Z_][a-zA-Z0-9_]*"]
+  ]
+}
