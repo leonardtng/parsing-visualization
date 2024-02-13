@@ -2,25 +2,28 @@
   "start": "CD",
   "productionMap": {
     "chars": [
-      ["u", ["chars"]],
-      ["e", []]
+      ["c1", ["chars"]],
+      ["c2", []]
     ],
-    "CD": [["a", ["AM", "class", "ID", "{", "CB", "}"]]],
+    "CD": [["cd", ["AM", "class", "ID", "{", "CB", "}"]]],
     "AM": [
-      ["b", ["public"]],
-      ["c", ["private"]],
-      ["d", ["protected"]]
+      ["am1", ["public"]],
+      ["am2", ["private"]],
+      ["am3", ["protected"]]
     ],
     "CB": [
-      ["f", ["MD", "CB"]],
-      ["g", []]
+      ["cb1", ["MD", "CB"]],
+      ["cb2", []]
     ],
     "MD": [
       ["h", ["VD"]],
       ["i", ["MthD"]]
     ],
     "VD": [["j", ["Ty", "ID", ";"]]],
-    "MthD": [["k", ["AM", "Ty", "ID", "(", "PL", ")", "{", "MB", "}"]]],
+    "MthD": [
+      ["k", ["AM", "Ty", "ID", "(", "PL", ")", "{", "MB", "}"]],
+      ["j", ["Ty", "ID", "(", "PL", ")", "{", "MB", "}"]]
+    ],
     "PL": [
       ["l", ["P", ",", "PL"]],
       ["m", ["P"]],

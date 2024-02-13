@@ -30,13 +30,14 @@ export const useParser = (grammar: Grammar, input: string) => {
     }
   }, [parseRules, tokens]);
 
-  const debouncedParse = useMemo(() => debounce(parse, 1000), [parse]);
+  const debouncedParse = debounce(parse, 1000);
 
   useEffect(() => {
     debouncedParse();
 
     return () => debouncedParse.cancel();
-  }, [debouncedParse]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input]);
 
   return { chart, directory };
 };
