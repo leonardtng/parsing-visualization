@@ -23,3 +23,36 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+
+/* tree styles */
+.node__root > circle {
+  fill: #45B26B;
+  stroke: #45B26B;
+}
+
+.node__root_error > circle {
+  fill: #F12120;
+  stroke: #F12120;
+}
+
+.rd3t-node.node__branch > circle {
+  fill: #45B26B;
+  stroke: #45B26B;
+}
+
+.rd3t-leaf-node.node__branch > circle {
+  stroke: #9B9B9B;
+}
+
+.node__leaf > circle {
+  stroke: #9B9B9B;
+}
+
+.rd3t-link {
+  stroke: #9B9B9B !important;
+}
+
+.rd3t-label__title {
+  fill: #9B9B9B !important;
+}

@@ -3,6 +3,8 @@ export * from "./atoms/ArrowToggle";
 export * from "./atoms/Checkbox";
 export * from "./atoms/CircularProgress";
 export * from "./atoms/Select";
+export * from "./atoms/Tabs";
+export * from "./atoms/TabsContent";
 export * from "./atoms/Tooltip";
 
 // Molecules
@@ -10,6 +12,7 @@ export { default as Chart } from "./molecules/Chart";
 export { default as Editor } from "./molecules/Editor";
 export { default as GrammarSelector } from "./molecules/GrammarSelector";
 export { default as ProductionMapDrawer } from "./molecules/ProductionMapDrawer";
+export { default as ParseTree } from "./molecules/ParseTree";
 
 // Organisms
 export { default as LandingView } from "./organisms/LandingView";

@@ -1,3 +1,8 @@
+interface JsonTree {
+  name: string;
+  children?: JsonTree[];
+}
+
 class MountainPeak {
   symbol: string;
   children: string[];
@@ -33,45 +38,64 @@ class Tree {
   }
 
   toJsonTreeArray() {
-    // Check if parse was successful
-    if (this.symbol === "") {
-      // Create individual JSON for each child
-      return this.children.map((child) => {
-        const jsonTree: any = {
-          name: child.symbol,
-          children: [],
-        };
+    const jsonTree: JsonTree = {
+      name: this.symbol || "",
+      children: [],
+    };
 
-        // Add children to the JSON
-        child.children.forEach((grandChild) => {
-          jsonTree.children.push({
+    // Add children to the JSON
+    this.children.forEach((child) => {
+      jsonTree.children?.push({
+        name: child.symbol,
+        children: child.children.map((grandChild) => {
+          return {
             name: grandChild,
-          });
-        });
-
-        return jsonTree;
+          };
+        }),
       });
-    } else {
-      // Create JSON for the root
-      const jsonTree: any = {
-        name: this.symbol,
-        children: [],
-      };
+    });
 
-      // Add children to the JSON
-      this.children.forEach((child) => {
-        jsonTree.children.push({
-          name: child.symbol,
-          children: child.children.map((grandChild) => {
-            return {
-              name: grandChild,
-            };
-          }),
-        });
-      });
+    return [jsonTree];
 
-      return [jsonTree];
-    }
+    // Check if parse was successful
+    // if (this.symbol === "") {
+    //   // Create individual JSON for each child
+    //   return this.children.map((child) => {
+    //     const jsonTree: any = {
+    //       name: child.symbol,
+    //       children: [],
+    //     };
+
+    //     // Add children to the JSON
+    //     child.children.forEach((grandChild) => {
+    //       jsonTree.children.push({
+    //         name: grandChild,
+    //       });
+    //     });
+
+    //     return jsonTree;
+    //   });
+    // } else {
+    //   // Create JSON for the root
+    //   const jsonTree: any = {
+    //     name: this.symbol,
+    //     children: [],
+    //   };
+
+    //   // Add children to the JSON
+    //   this.children.forEach((child) => {
+    //     jsonTree.children.push({
+    //       name: child.symbol,
+    //       children: child.children.map((grandChild) => {
+    //         return {
+    //           name: grandChild,
+    //         };
+    //       }),
+    //     });
+    //   });
+
+    //   return [jsonTree];
+    // }
   }
 }
 

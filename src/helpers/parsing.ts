@@ -3,6 +3,7 @@ import debounce from "lodash/debounce";
 import {
   Chart,
   Nonterminal,
+  Symbol,
   Terminal,
   generateChart,
   lexer,
@@ -57,4 +58,35 @@ export const useAnalyzeParse = () => {
   );
 
   return { isComplete, grid, gridSize };
+};
+
+export const useGetCellData = () => {
+  const { directory, getDisplayedNode, showMostRelevant } = useParsingContext();
+  const { gridSize } = useAnalyzeParse();
+
+  const getCellData = (
+    col: Symbol[] | null,
+    rowIndex: number,
+    colIndex: number
+  ) => {
+    if (showMostRelevant) {
+      if (rowIndex === 0 && colIndex === gridSize - 1) {
+        const cell = getDisplayedNode(col);
+
+        return { cell, tooltip: directory?.[cell] };
+      } else {
+        const cell = (col?.[0] as Terminal | Nonterminal)?.name;
+
+        return { cell, tooltip: directory?.[cell] };
+      }
+    } else {
+      const cell = col?.map((cell) => (cell as Terminal | Nonterminal).name);
+      return {
+        cell: cell?.join(", "),
+        tooltip: cell?.map((content) => directory?.[content]).join(", "),
+      };
+    }
+  };
+
+  return { getCellData };
 };
