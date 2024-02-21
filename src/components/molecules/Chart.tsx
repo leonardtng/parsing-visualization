@@ -12,7 +12,7 @@ import {
 
 const Chart = () => {
   const [winWidth, winHeight] = useWindowSize();
-  const { directory, getDisplayedNode, showMostRelevant } = useParsingContext();
+  const { chart, showMostRelevant } = useParsingContext();
   const { isComplete, grid, gridSize } = useAnalyzeParse();
   const { shadowStyles } = useTieredEffect();
   const gridRef = useRef<HTMLDivElement>(null);
@@ -24,6 +24,21 @@ const Chart = () => {
     displayShadowEndX,
   } = useScrollShadow({ deps: [gridRef] });
   const { getCellData } = useGetCellData();
+
+  // console.log("BEFORE");
+  // if (chart) {
+  //   [...chart.items.entries()].forEach(([rowNumber, rows]) => {
+  //     [...rows.entries()].forEach(([colNumber, cols]) => {
+  //       [...cols.entries()].forEach(([item, prevPositionSet]) => {
+  //         if (item.consumed > 0)
+  //           console.log(item, rowNumber, colNumber, prevPositionSet);
+  //         if (prevPositionSet.size > 0) {
+  //           console.log("item", prevPositionSet);
+  //         }
+  //       });
+  //     });
+  //   });
+  // }
 
   return (
     <div className="relative w-full h-full overflow-hidden z-0">

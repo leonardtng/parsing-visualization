@@ -9,6 +9,11 @@ import {
   TabData,
   Tabs,
 } from "@/components";
+import ForceGraph from "../molecules/ForceGraph";
+import dynamic from "next/dynamic";
+const NoSSRForceGraph = dynamic(() => import("../molecules/ForceGraph"), {
+  ssr: false,
+});
 
 const LandingView = () => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -18,6 +23,10 @@ const LandingView = () => {
   ) => setActiveTabIndex(newActiveTabIndex);
 
   const tabs: TabData[] = [
+    {
+      label: "Force",
+      Content: () => <NoSSRForceGraph />,
+    },
     {
       label: "Tree",
       Content: () => <ParseTree />,

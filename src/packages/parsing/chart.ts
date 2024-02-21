@@ -1,5 +1,32 @@
-import { Nonterminal, ParseRules, Symbol, Terminal } from "@/packages/grammar";
+import {
+  Nonterminal,
+  ParseRules,
+  Rhs,
+  Symbol,
+  Terminal,
+} from "@/packages/grammar";
 import { Item } from "@/packages/parsing";
+import { ComponentProps } from "react";
+import { ForceGraph2D } from "react-force-graph";
+
+type GraphData = ComponentProps<typeof ForceGraph2D>["graphData"];
+
+interface Thing {
+  lhs: Nonterminal;
+  rhs: Rhs;
+  positions: number[]; // first and last element is the parent
+  //each of the elements in the positions array is a child that corresponds to the positions.
+
+  // A -> A B C
+  // 1345 => A 1 5 is parent
+  // A 1 3, B 3 4, C 4 5 are children
+}
+
+interface SymbolEntry {
+  start: number;
+  end: number;
+  symbol: Symbol;
+}
 
 export class AutoMap<K, V> extends Map<K, V> {
   makeDefaultValue: () => V;
@@ -56,6 +83,7 @@ export class Chart {
 
   addItem(start: number, end: number, item: Item, split: number | undefined) {
     if (!this.items.get(start).get(end).get(item).has(split)) {
+      this.items.get(start).get(end).get(item).add(split);
       const consumed = item.consume();
 
       if (!consumed) {
@@ -72,6 +100,167 @@ export class Chart {
           });
       }
     }
+  }
+
+  getThingParent(thing: Thing): SymbolEntry {
+    return {
+      start: thing.positions[0],
+      end: thing.positions[thing.positions.length - 1],
+      symbol: thing.lhs,
+    };
+  }
+
+  getThingChildren(thing: Thing): SymbolEntry[] {
+    const children = [];
+
+    // It's minus 1 and less than (not equal) because we are getting pairs from first to last, and the total pairs is length - 1 (and i is the first element of the pair)
+    for (let i = 0; i < thing.positions.length - 1; i++) {
+      children.push({
+        start: thing.positions[i],
+        end: thing.positions[i + 1],
+        symbol: thing.rhs.elements[i].symbol,
+      });
+    }
+
+    return children;
+  }
+
+  generateThingPositions(
+    start: number,
+    end: number,
+    item: Item
+  ): Set<number[]> {
+    let result = new Set<number[]>();
+
+    Array.from(this.items.get(start).get(end).get(item), (split) => {
+      if (split === undefined) {
+        console.assert(start === end);
+        console.assert(item.consumed === 0);
+        result.add([start]);
+      } else {
+        const previous = Item.make(item.lhs, item.rhs, item.consumed - 1);
+        const previousThings = this.generateThingPositions(
+          start,
+          split,
+          previous
+        );
+
+        previousThings.forEach((thing) => {
+          result.add([...thing, end]);
+        });
+      }
+    });
+
+    return result;
+  }
+
+  generateAllThings(start: number, end: number, item: Item): Set<Thing> {
+    // For each result, pair the number list with the production of that item.
+    const result = new Set<Thing>();
+
+    const positions = this.generateThingPositions(start, end, item);
+
+    positions.forEach((positionList) => {
+      result.add({
+        lhs: item.lhs,
+        rhs: item.rhs,
+        positions: positionList,
+      });
+    });
+
+    return result;
+  }
+
+  generateThingChart(): AutoMap<
+    number,
+    AutoMap<number, AutoMap<Symbol, Set<Thing>>>
+  > {
+    // Go through the chart's items and look only at the items that are complete.
+    // ie the consumed is equal to the length of the rhs
+    // For each complete item, call generateAllThings(start, end, item)
+
+    const result: AutoMap<
+      number,
+      AutoMap<number, AutoMap<Symbol, Set<Thing>>>
+    > = new AutoMap(() => new AutoMap(() => new AutoMap(() => new Set())));
+
+    this.items.forEach((endMap, start) => {
+      endMap.forEach((itemMap, end) => {
+        itemMap.forEach((split, item) => {
+          if (item.consumed === item.rhs.elements.length) {
+            // console.log("item", item, start, end);
+            const things = this.generateAllThings(start, end, item);
+
+            things.forEach((thing) => {
+              result.get(start).get(end).get(item.lhs).add(thing);
+            });
+          }
+        });
+      });
+    });
+
+    return result;
+  }
+
+  generateGraphData() {
+    const thingChart = this.generateThingChart();
+
+    let nodes: {
+      id: string;
+      leafStart?: number;
+      fy?: number;
+      fx?: number;
+    }[] = [];
+
+    let links: {
+      source: string;
+      target: string;
+    }[] = [];
+
+    thingChart.forEach((rows) => {
+      rows.forEach((cols) => {
+        cols.forEach((things) => {
+          things.forEach((thing) => {
+            const parent = this.getThingParent(thing);
+            const children = this.getThingChildren(thing);
+            console.log("thing", thing, children);
+
+            nodes.push({
+              id: JSON.stringify(thing),
+            });
+
+            links.push({
+              source: JSON.stringify(parent),
+              target: JSON.stringify(thing),
+            });
+
+            children.forEach((child) => {
+              links.push({
+                source: JSON.stringify(thing),
+                target: JSON.stringify(child),
+              });
+            });
+          });
+        });
+      });
+    });
+
+    [...this.symbols.entries()].forEach(([start, rows]) => {
+      [...rows.entries()].forEach(([end, symbols]) => {
+        symbols.forEach((symbol) => {
+          nodes.push({
+            leafStart: symbol instanceof Terminal ? start : undefined,
+            id: JSON.stringify({
+              start,
+              end,
+              symbol,
+            }),
+          });
+        });
+      });
+    });
+
+    return { nodes, links };
   }
 
   addEpsilonItems(productionMap: ParseRules["productionMap"]) {

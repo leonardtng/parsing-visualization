@@ -22,5 +22,6 @@ export { default as ParsingContextProvider } from "./providers/ParsingContextPro
 
 // Templates
 export { default as AppContextProviders } from "./templates/AppContextProviders";
+export { default as ClientOnly } from "./templates/ClientOnly";
 export { default as DocumentHead } from "./templates/DocumentHead";
 export { default as PageTemplate } from "./templates/PageTemplate";
