@@ -38,7 +38,7 @@ export const useParser = (grammar: Grammar, input: string) => {
 
     return () => debouncedParse.cancel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input]);
+  }, [grammar, input]);
 
   return { chart, directory };
 };

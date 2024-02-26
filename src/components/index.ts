@@ -3,6 +3,7 @@ export * from "./atoms/ArrowToggle";
 export * from "./atoms/Checkbox";
 export * from "./atoms/CircularProgress";
 export * from "./atoms/Select";
+export * from "./atoms/Switch";
 export * from "./atoms/Tabs";
 export * from "./atoms/TabsContent";
 export * from "./atoms/Tooltip";

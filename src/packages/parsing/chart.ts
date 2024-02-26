@@ -207,9 +207,15 @@ export class Chart {
 
     let nodes: {
       id: string;
-      leafStart?: number;
       fy?: number;
       fx?: number;
+      y?: number;
+      x?: number;
+
+      leafStart?: number;
+      color?: string;
+      name?: string;
+      isSymbol?: boolean;
     }[] = [];
 
     let links: {
@@ -223,10 +229,16 @@ export class Chart {
           things.forEach((thing) => {
             const parent = this.getThingParent(thing);
             const children = this.getThingChildren(thing);
-            console.log("thing", thing, children);
 
             nodes.push({
               id: JSON.stringify(thing),
+              isSymbol: false,
+              color: "#003f5c",
+              name: `${thing.lhs.name} ➜ ${
+                thing.rhs.elements
+                  .map((e) => (e.symbol as Terminal | Nonterminal).name)
+                  .join(" ") || '""'
+              } [${thing.positions.join(",")}]`,
             });
 
             links.push({
@@ -249,12 +261,15 @@ export class Chart {
       [...rows.entries()].forEach(([end, symbols]) => {
         symbols.forEach((symbol) => {
           nodes.push({
+            name: (symbol as Terminal | Nonterminal).name,
             leafStart: symbol instanceof Terminal ? start : undefined,
+            isSymbol: true,
             id: JSON.stringify({
               start,
               end,
               symbol,
             }),
+            color: symbol instanceof Terminal ? "#ff6361" : "#58508d",
           });
         });
       });
