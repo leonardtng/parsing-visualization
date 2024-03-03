@@ -211,6 +211,8 @@ export class Chart {
       fx?: number;
       y?: number;
       x?: number;
+      vy?: number;
+      vx?: number;
 
       leafStart?: number;
       color?: string;
@@ -229,6 +231,12 @@ export class Chart {
           things.forEach((thing) => {
             const parent = this.getThingParent(thing);
             const children = this.getThingChildren(thing);
+
+            if (
+              thing.positions[0] === thing.positions[thing.positions.length - 1]
+            ) {
+              return;
+            }
 
             nodes.push({
               id: JSON.stringify(thing),
@@ -262,7 +270,10 @@ export class Chart {
         symbols.forEach((symbol) => {
           nodes.push({
             name: (symbol as Terminal | Nonterminal).name,
-            leafStart: symbol instanceof Terminal ? start : undefined,
+            leafStart:
+              symbol instanceof Terminal || start === end
+                ? start + end // fix epsilon symbols in between symbols
+                : undefined,
             isSymbol: true,
             id: JSON.stringify({
               start,

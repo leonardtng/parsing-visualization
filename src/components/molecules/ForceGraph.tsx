@@ -2,6 +2,9 @@ import React, { ComponentProps, useEffect, useRef, useState } from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { Switch } from "@/components";
 import { useParsingContext } from "@/constants";
+import * as d3 from "d3";
+
+const BASE_LAYER_SEPARATION = 30;
 
 type GraphData = ComponentProps<typeof ForceGraph2D>["graphData"];
 type FGRef = ComponentProps<typeof ForceGraph2D>["ref"];
@@ -9,7 +12,7 @@ type FGRef = ComponentProps<typeof ForceGraph2D>["ref"];
 const ForceGraph = () => {
   const fgRef: FGRef = useRef();
 
-  const { chart } = useParsingContext();
+  const { chart, input } = useParsingContext();
 
   const [graphData, setGraphData] = useState<GraphData>({
     nodes: [],
@@ -25,30 +28,68 @@ const ForceGraph = () => {
 
     // Deactivate existing force
     // fg.d3Force("center", () => {});
-    // fg.d3Force("charge", () => {});
+    // fg.d3Force("charge")?.forceManyBody().strength(-100);
 
     // Add collision and bounding box forces
     // fg.d3Force("collide", d3.forceCollide(4));
 
-    fg.d3Force("box", () => {
-      const SQUARE_HALF_SIDE = N * 2;
+    // fg.d3Force("box", () => {
+    //   newGraphData?.nodes.forEach((node) => {
+    //     if (node.leafStart !== undefined) {
+    //       // Leaves (Terminals)
+    //       node.fx = 100 * node.leafStart;
+    //       node.fy = 0;
+    //     } else {
+    //       // Things and Nonterminals
+    //       if (node.y && node.y > -50) {
+    //         node.y = -50;
+    //       }
+    //     }
+    //   });
+    // });
 
+    // fg.d3Force("collide", d3.forceCollide(4));
+
+    // fg.d3Force("box", () => {
+    //   const SQUARE_HALF_SIDE = 80 * 2;
+
+    //   newGraphData?.nodes.forEach((node) => {
+    //     const x = node.x || 0,
+    //       y = node.y || 0;
+
+    //     if (y > -50) {
+    //       node.vy *= -1;
+    //     }
+    //   });
+    // });
+
+    fg.d3Force("charge")?.strength(-50);
+
+    fg.d3Force("custom", () => {
       newGraphData?.nodes.forEach((node) => {
         if (node.leafStart !== undefined) {
           // Leaves (Terminals)
-          node.fx = 100 * node.leafStart;
+          node.fx = BASE_LAYER_SEPARATION * node.leafStart;
           node.fy = 0;
         } else {
           // Things and Nonterminals
-          if (node.y && node.y > -50) {
-            node.y = -50;
-          }
+          // if (node.y && node.y > -50) {
+          //   // if (node.id === `{"start":0,"end":1,"symbol":{"name":"S"}}`)
+          //   //   console.log(node.vy);
+          //   node.vy = -50;
+          // }
+
+          const baseLayerLength = newGraphData?.nodes.filter(
+            (node) => node.leafStart !== undefined
+          ).length;
+
+          node.vx = (baseLayerLength * BASE_LAYER_SEPARATION) / 2;
+          node.vy = (-baseLayerLength * BASE_LAYER_SEPARATION) / 2;
         }
       });
     });
 
     // // Generate nodes
-    const N = 80;
     // const nodes = [...Array(N).keys()].map(() => ({
     //   // Initial velocity in random direction
     //   vx: Math.random() * 2 - 1,
@@ -78,15 +119,20 @@ const ForceGraph = () => {
       <ForceGraph2D
         ref={fgRef}
         graphData={graphData}
-        cooldownTime={Infinity}
-        d3VelocityDecay={0}
+        // cooldownTime={Infinity}
+        d3VelocityDecay={0.01}
         linkColor={() => "#353945"}
         linkWidth={1.5}
-        linkDirectionalArrowLength={2.5}
+        linkDirectionalArrowLength={5}
         // linkDirectionalArrowRelPos={1}
         // linkCurvature={0.25}
         nodeColor={(node) => node.color}
         nodeLabel={isDebug ? undefined : "id"}
+        onNodeDragEnd={(node) => {
+          if (node.y && node.y > -50) {
+            node.y = -Math.abs(node.y);
+          }
+        }}
         nodeCanvasObject={(node, ctx, globalScale) => {
           if (!node) return;
           const label = (isDebug ? node.id : node.name) as string;
@@ -100,7 +146,17 @@ const ForceGraph = () => {
             ctx.fill();
 
             ctx.fillStyle = "#fff";
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            ctx.fillText(label, node.x as number, node.y as number);
           } else {
+            ctx.beginPath();
+            ctx.arc(node.x!, node.y!, 1 * 1.4, 0, 2 * Math.PI, false);
+            ctx.fillStyle = node.color;
+            ctx.fill();
+
             ctx.fillStyle = node.color;
           }
 
@@ -116,10 +172,10 @@ const ForceGraph = () => {
           //   ...bckgDimensions
           // );
 
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
+          // ctx.textAlign = "center";
+          // ctx.textBaseline = "middle";
 
-          ctx.fillText(label, node.x as number, node.y as number);
+          // ctx.fillText(label, node.x as number, node.y as number);
 
           // node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
         }}
