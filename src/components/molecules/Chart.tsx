@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Tooltip } from "@/components";
 import { useParsingContext } from "@/constants";
@@ -10,7 +10,11 @@ import {
   useWindowSize,
 } from "@/helpers";
 
-const Chart = () => {
+interface Props {
+  isRendered?: boolean;
+}
+
+const Chart: FC<Props> = ({ isRendered = true }: Props) => {
   const [winWidth, winHeight] = useWindowSize();
   const { chart, showMostRelevant } = useParsingContext();
   const { isComplete, grid, gridSize } = useAnalyzeParse();
@@ -41,7 +45,11 @@ const Chart = () => {
   // }
 
   return (
-    <div className="relative w-full h-full overflow-hidden z-0">
+    <div
+      className={`relative w-full h-full overflow-hidden z-0 ${
+        isRendered ? "" : "hidden"
+      }`}
+    >
       {displayShadowStartY && (
         <div className="absolute w-full flex justify-center top-0 left-0 z-20 pointer-events-none">
           <div
@@ -107,7 +115,7 @@ const Chart = () => {
                     ? "border-success text-success"
                     : "border-error text-error"
                   : "border-gray-700"
-              } break-words overflow-auto no-scrollbar`}
+              } break-words overflow-auto`}
                   >
                     {cell}
                   </div>
@@ -144,7 +152,7 @@ const Chart = () => {
         </div>
       )}
 
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
@@ -155,7 +163,7 @@ const Chart = () => {
           height: winWidth,
           ...shadowStyles,
         }}
-      />
+      /> */}
     </div>
   );
 };

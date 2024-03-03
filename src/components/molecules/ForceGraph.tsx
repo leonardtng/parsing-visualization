@@ -1,25 +1,47 @@
-import React, { ComponentProps, useEffect, useRef, useState } from "react";
+import React, {
+  ComponentProps,
+  FC,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ForceGraph2D } from "react-force-graph";
 import { Switch } from "@/components";
 import { useParsingContext } from "@/constants";
 import * as d3 from "d3";
+import { useWindowSize } from "@/helpers";
 
 const BASE_LAYER_SEPARATION = 30;
 
 type GraphData = ComponentProps<typeof ForceGraph2D>["graphData"];
 type FGRef = ComponentProps<typeof ForceGraph2D>["ref"];
 
-const ForceGraph = () => {
+interface Props {
+  isRendered?: boolean;
+}
+
+const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
+  const [winWidth, winHeight] = useWindowSize();
+
+  const containerRef = useRef<HTMLDivElement>(null);
   const fgRef: FGRef = useRef();
+
+  const [isFree, setIsFree] = useState<boolean>(false);
+
+  const handleChangeIsFree = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsFree(event.target.checked);
+  };
+
+  const [isDebug, setIsDebug] = useState<boolean>(false);
+
+  const handleChangeDebug = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsDebug(event.target.checked);
+  };
 
   const { chart, input } = useParsingContext();
 
-  const [graphData, setGraphData] = useState<GraphData>({
-    nodes: [],
-    links: [],
-  });
-
-  useEffect(() => {
+  const graphData: GraphData = useMemo(() => {
     const fg = fgRef?.current;
 
     if (!fg) return;
@@ -63,31 +85,33 @@ const ForceGraph = () => {
     //   });
     // });
 
-    fg.d3Force("charge")?.strength(-50);
+    if (!isFree) {
+      fg.d3Force("custom", () => {
+        newGraphData?.nodes.forEach((node) => {
+          if (node.leafStart !== undefined) {
+            // Leaves (Terminals)
+            node.fx = BASE_LAYER_SEPARATION * node.leafStart;
+            node.fy = 0;
+          } else {
+            // Things and Nonterminals
+            // if (node.y && node.y > -50) {
+            //   // if (node.id === `{"start":0,"end":1,"symbol":{"name":"S"}}`)
+            //   //   console.log(node.vy);
+            //   node.vy = -50;
+            // }
 
-    fg.d3Force("custom", () => {
-      newGraphData?.nodes.forEach((node) => {
-        if (node.leafStart !== undefined) {
-          // Leaves (Terminals)
-          node.fx = BASE_LAYER_SEPARATION * node.leafStart;
-          node.fy = 0;
-        } else {
-          // Things and Nonterminals
-          // if (node.y && node.y > -50) {
-          //   // if (node.id === `{"start":0,"end":1,"symbol":{"name":"S"}}`)
-          //   //   console.log(node.vy);
-          //   node.vy = -50;
-          // }
+            const baseLayerLength = new Set(
+              newGraphData?.nodes
+                .filter((node) => node.leafStart !== undefined)
+                .map((node) => node.leafStart)
+            ).size;
 
-          const baseLayerLength = newGraphData?.nodes.filter(
-            (node) => node.leafStart !== undefined
-          ).length;
-
-          node.vx = (baseLayerLength * BASE_LAYER_SEPARATION) / 2;
-          node.vy = (-baseLayerLength * BASE_LAYER_SEPARATION) / 2;
-        }
+            node.vx = (baseLayerLength * BASE_LAYER_SEPARATION) / 2;
+            node.vy = (-baseLayerLength * BASE_LAYER_SEPARATION) / 2;
+          }
+        });
       });
-    });
+    }
 
     // // Generate nodes
     // const nodes = [...Array(N).keys()].map(() => ({
@@ -98,21 +122,63 @@ const ForceGraph = () => {
     //   y: undefined,
     // }));
 
-    setGraphData(newGraphData);
+    return newGraphData;
+  }, [chart, isFree, fgRef]);
+
+  const [dimensions, setDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    if (isRendered) {
+      fgRef.current?.zoomToFit(500, 50);
+
+      setDimensions({
+        width: containerRef.current?.clientWidth || 0,
+        height: containerRef.current?.clientHeight || 0,
+      });
+    }
+  }, [isRendered, winWidth, winHeight]);
+
+  useEffect(() => {
+    setTimeout(() => fgRef.current?.zoomToFit(500, 50), 500);
   }, [chart]);
 
-  const [isDebug, setIsDebug] = useState<boolean>(false);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsDebug(event.target.checked);
-  };
-
   return (
-    <div className="relative">
+    <div
+      ref={containerRef}
+      className={`w-full h-full overflow-hidden ${
+        isRendered ? "relative" : "invisible absolute"
+      }`}
+    >
       <div className="absolute top-0 left-0 z-10 flex justify-center w-full">
-        <div className="w-full max-w-[500px] flex justify-end items-center gap-2">
-          <span className="text-xs">Debug</span>
-          <Switch checked={isDebug} onChange={handleChange} />
+        <div className="w-full max-w-[500px] flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs">Free</span>
+            <Switch
+              checked={isFree}
+              onChange={handleChangeIsFree}
+              className={`${
+                isFree
+                  ? "[&_.switchCasing]:bg-success"
+                  : "[&_.switchCasing]:bg-gray-300"
+              }`}
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs">Debug</span>
+            <Switch
+              checked={isDebug}
+              onChange={handleChangeDebug}
+              className={`${
+                isDebug
+                  ? "[&_.switchCasing]:bg-success"
+                  : "[&_.switchCasing]:bg-gray-300"
+              }`}
+            />
+          </div>
         </div>
       </div>
 
@@ -133,6 +199,8 @@ const ForceGraph = () => {
             node.y = -Math.abs(node.y);
           }
         }}
+        height={dimensions.height}
+        width={dimensions.width}
         nodeCanvasObject={(node, ctx, globalScale) => {
           if (!node) return;
           const label = (isDebug ? node.id : node.name) as string;
