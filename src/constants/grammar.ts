@@ -4,6 +4,7 @@ import json from "./grammar/json.json";
 import java from "./grammar/java.json";
 import squareBrackets from "./grammar/square-brackets.json";
 import matchingPairs from "./grammar/matching-pairs.json";
+import levels from "./grammar/levels.json";
 import ambiguous from "./grammar/ambiguous.json";
 
 export const GRAMMARS: Grammar[] = [
@@ -26,6 +27,11 @@ export const GRAMMARS: Grammar[] = [
     key: GrammarKey.MATCHING_PAIRS,
     label: "Matching Pairs",
     data: matchingPairs as unknown as Json,
+  },
+  {
+    key: GrammarKey.LEVELS,
+    label: "Levels",
+    data: levels as unknown as Json,
   },
   {
     key: GrammarKey.AMBIGUOUS,
