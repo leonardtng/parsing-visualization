@@ -81,7 +81,7 @@ const Chart: FC<Props> = ({ isRendered = true }: Props) => {
         className={`w-full h-full overflow-auto flex z-0 p-3 ${
           gridRef.current && gridRef.current.scrollWidth > winWidth
             ? "justify-start"
-            : "justify-center"
+            : "justify-center md:justify-start"
         }`}
       >
         <div

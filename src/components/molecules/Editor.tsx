@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import AceEditor from "react-ace";
 import { ParsingContext } from "@/constants";
 import "ace-builds/src-noconflict/ext-language_tools";
+import { useBreakpoint } from "@/helpers";
 
 const languages = [
   "javascript",
@@ -43,16 +44,18 @@ languages.forEach((lang) => {
 themes.forEach((theme) => require(`ace-builds/src-noconflict/theme-${theme}`));
 
 const Editor = () => {
+  const isWeb = useBreakpoint("md");
+
   const { onInputChange } = useContext(ParsingContext);
 
   return (
-    <div className="w-full max-w-[500px]">
+    <div className="flex-1 w-full max-w-[500px] md:max-w-none h-full md:h-auto">
       <AceEditor
         theme="monokai"
         onChange={onInputChange}
         name="editor"
         editorProps={{ $blockScrolling: true }}
-        height="250px"
+        height={isWeb ? "100%" : "250px"}
         width="100%"
       />
     </div>

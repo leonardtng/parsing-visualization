@@ -43,26 +43,27 @@ const LandingView = () => {
 
   return (
     <div className="w-full h-screen flex flex-col items-center gap-3 md:gap-6 pt-12 md:pt-24 overflow-hidden z-0">
-      <div className="flex flex-col gap-3 items-center z-10">
-        <div className="font-bold text-xl mb-1">Parsing Visualization</div>
-        <GrammarSelector />
-      </div>
-
-      <div className="flex-1 flex flex-col items-center gap-5 w-full overflow-hidden z-0">
-        <Editor />
-
-        <div className="w-full flex justify-center">
-          <Tabs
-            tabs={tabs}
-            value={activeTabIndex}
-            onChange={onTabChange}
-            className="w-full max-w-[500px] [&_.tabsBase]:space-x-0 [&_.tabsBase]:border-b-fontSecondary [&_.tabsUnderline]:bg-primary [&_.inactiveTabsButton]:text-fontSecondary"
-          />
+      <div className="flex-1 flex flex-col md:flex-row md:gap-12 items-center md:items-start gap-5 w-full overflow-hidden z-0">
+        <div className="h-auto md:h-full min-w-[500px] md:min-w-[40%] md:pl-12 md:pb-12 flex flex-col gap-3 items-center z-10">
+          <div className="font-bold text-xl mb-1">Parsing Visualization</div>
+          <GrammarSelector showFilter={activeTabIndex === 1} />
+          <Editor />
         </div>
 
-        <NoSSRForceGraph isRendered={activeTabIndex === 0} />
+        <div className="h-auto md:h-full flex-1 w-full flex flex-col gap-5 overflow-hidden px-0 md:pr-12">
+          <div className="w-full flex justify-center">
+            <Tabs
+              tabs={tabs}
+              value={activeTabIndex}
+              onChange={onTabChange}
+              className="w-full max-w-[500px] md:max-w-none [&_.tabsBase]:space-x-0 [&_.tabsBase]:border-b-fontSecondary [&_.tabsUnderline]:bg-primary [&_.inactiveTabsButton]:text-fontSecondary"
+            />
+          </div>
 
-        <Chart isRendered={activeTabIndex === 1} />
+          <NoSSRForceGraph isRendered={activeTabIndex === 0} />
+
+          <Chart isRendered={activeTabIndex === 1} />
+        </div>
       </div>
 
       <motion.div

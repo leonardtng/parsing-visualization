@@ -6,10 +6,28 @@ import {
   Terminal,
 } from "@/packages/grammar";
 import { Item } from "@/packages/parsing";
-import { ComponentProps } from "react";
-import { ForceGraph2D } from "react-force-graph";
 
-type GraphData = ComponentProps<typeof ForceGraph2D>["graphData"];
+export interface GraphNode {
+  id: string;
+  fy?: number;
+  fx?: number;
+  y?: number;
+  x?: number;
+  vy?: number;
+  vx?: number;
+
+  level?: number;
+  leafStart?: number;
+  color?: string;
+  name?: string;
+  isSymbol?: boolean;
+}
+
+export interface GraphLink {
+  source: string;
+  target: string;
+  grammarKey?: string;
+}
 
 interface Thing {
   lhs: Nonterminal;
@@ -205,25 +223,9 @@ export class Chart {
   generateGraphData() {
     const thingChart = this.generateThingChart();
 
-    let nodes: {
-      id: string;
-      fy?: number;
-      fx?: number;
-      y?: number;
-      x?: number;
-      vy?: number;
-      vx?: number;
+    let nodes: GraphNode[] = [];
 
-      leafStart?: number;
-      color?: string;
-      name?: string;
-      isSymbol?: boolean;
-    }[] = [];
-
-    let links: {
-      source: string;
-      target: string;
-    }[] = [];
+    let links: GraphLink[] = [];
 
     thingChart.forEach((rows) => {
       rows.forEach((cols) => {
@@ -286,7 +288,16 @@ export class Chart {
       });
     });
 
-    return { nodes, links };
+    const hasCycle = this.hasCycle(nodes, links);
+
+    // Generate levels when no cycles in links
+    if (!hasCycle) {
+      nodes.forEach((node) => {
+        this.getNodeLevel(node, nodes, links);
+      });
+    }
+
+    return { nodes, links, hasCycle };
   }
 
   addEpsilonItems(productionMap: ParseRules["productionMap"]) {
@@ -368,5 +379,95 @@ export class Chart {
       process.stdout.write("-".repeat((maxSize + 1) * 4 + 1));
       process.stdout.write("\n");
     }
+  }
+
+  // Graph utils
+  getNodeChildren(node: GraphNode, nodes: GraphNode[], links: GraphLink[]) {
+    const childrenIds = new Set(
+      links
+        .filter((link: GraphLink) => link.source === node.id)
+        .map((link: GraphLink) => link.target)
+    );
+
+    return nodes.filter((node: GraphNode) => childrenIds.has(node.id));
+  }
+
+  getNodeLevel(node: GraphNode, nodes: GraphNode[], links: GraphLink[]) {
+    if (!node.level) {
+      let maxLevel = 0;
+
+      const children = this.getNodeChildren(node, nodes, links);
+
+      children.forEach((node: GraphNode) => {
+        maxLevel = Math.max(maxLevel, this.getNodeLevel(node, nodes, links));
+      });
+
+      node.level = maxLevel + 1;
+    }
+    return node.level;
+  }
+
+  hasCycle(nodes: GraphNode[], links: GraphLink[]) {
+    function buildGraph(
+      nodes: GraphNode[],
+      links: GraphLink[]
+    ): Map<string, string[]> {
+      const graph = new Map<string, string[]>();
+
+      nodes.forEach((node) => {
+        graph.set(node.id, []); // Initialize each node with an empty array of connections
+      });
+
+      links.forEach((link) => {
+        if (graph.has(link.source)) {
+          graph.get(link.source)!.push(link.target);
+        }
+      });
+
+      return graph;
+    }
+
+    function hasCycleUtil(
+      node: string,
+      graph: Map<string, string[]>,
+      visited: Set<string>,
+      recStack: Set<string>
+    ): boolean {
+      if (!visited.has(node)) {
+        visited.add(node);
+        recStack.add(node);
+
+        const neighbors = graph.get(node) || [];
+        for (const neighbor of neighbors) {
+          if (
+            !visited.has(neighbor) &&
+            hasCycleUtil(neighbor, graph, visited, recStack)
+          ) {
+            return true;
+          } else if (recStack.has(neighbor)) {
+            return true;
+          }
+        }
+      }
+
+      recStack.delete(node);
+      return false;
+    }
+
+    function hasCycle(nodes: GraphNode[], links: GraphLink[]): boolean {
+      const graph = buildGraph(nodes, links);
+      const visited = new Set<string>();
+      const recStack = new Set<string>();
+
+      for (const node of graph.keys()) {
+        if (hasCycleUtil(node, graph, visited, recStack)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    return hasCycle(nodes, links);
   }
 }

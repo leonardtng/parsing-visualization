@@ -14,7 +14,12 @@ import { useWindowSize } from "@/helpers";
 
 const BASE_LAYER_SEPARATION = 30;
 
-type GraphData = ComponentProps<typeof ForceGraph2D>["graphData"];
+interface AdditionalGraphData {
+  hasCycle: boolean;
+}
+
+type GraphData = ComponentProps<typeof ForceGraph2D>["graphData"] &
+  Partial<AdditionalGraphData>;
 type FGRef = ComponentProps<typeof ForceGraph2D>["ref"];
 
 interface Props {
@@ -39,9 +44,9 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     setIsDebug(event.target.checked);
   };
 
-  const { chart, input } = useParsingContext();
+  const { chart } = useParsingContext();
 
-  const graphData: GraphData = useMemo(() => {
+  const graphData: GraphData | undefined = useMemo(() => {
     const fg = fgRef?.current;
 
     if (!fg) return;
@@ -100,14 +105,18 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             //   node.vy = -50;
             // }
 
-            const baseLayerLength = new Set(
-              newGraphData?.nodes
-                .filter((node) => node.leafStart !== undefined)
-                .map((node) => node.leafStart)
-            ).size;
+            if (!newGraphData.hasCycle) {
+              if (node.level !== undefined) node.y = -node.level * 50;
+            } else {
+              const baseLayerLength = new Set(
+                newGraphData?.nodes
+                  .filter((node) => node.leafStart !== undefined)
+                  .map((node) => node.leafStart)
+              ).size;
 
-            node.vx = (baseLayerLength * BASE_LAYER_SEPARATION) / 2;
-            node.vy = (-baseLayerLength * BASE_LAYER_SEPARATION) / 2;
+              node.vx = (baseLayerLength * BASE_LAYER_SEPARATION) / 2;
+              node.vy = (-baseLayerLength * BASE_LAYER_SEPARATION) / 2;
+            }
           }
         });
       });
@@ -123,7 +132,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     // }));
 
     return newGraphData;
-  }, [chart, isFree, fgRef]);
+  }, [chart, isFree]);
 
   const [dimensions, setDimensions] = useState({
     width: 0,
@@ -153,7 +162,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       }`}
     >
       <div className="absolute top-0 left-0 z-10 flex justify-center w-full">
-        <div className="w-full max-w-[500px] flex justify-between items-center gap-2">
+        <div className="w-full max-w-[500px] md:max-w-none flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="text-xs">Free</span>
             <Switch
@@ -186,7 +195,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         ref={fgRef}
         graphData={graphData}
         // cooldownTime={Infinity}
-        d3VelocityDecay={0.01}
+        d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0.8}
         linkColor={() => "#353945"}
         linkWidth={1.5}
         linkDirectionalArrowLength={5}
