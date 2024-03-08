@@ -216,9 +216,11 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
           const fontSize = 14 / globalScale;
           ctx.font = `${fontSize}px Sans-Serif`;
 
+          const nodeScale = 11 / globalScale;
+
           if (node.isSymbol) {
             ctx.beginPath();
-            ctx.arc(node.x!, node.y!, 2 * 1.4, 0, 2 * Math.PI, false);
+            ctx.arc(node.x!, node.y!, nodeScale * 1.4, 0, 2 * Math.PI, false);
             ctx.fillStyle = node.color;
             ctx.fill();
 
