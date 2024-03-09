@@ -106,7 +106,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             // }
 
             if (!newGraphData.hasCycle) {
-              if (node.level !== undefined) node.y = -node.level * 50;
+              if (node.level !== undefined) node.fy = -node.level * 50;
             } else {
               const baseLayerLength = new Set(
                 newGraphData?.nodes
@@ -194,8 +194,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       <ForceGraph2D
         ref={fgRef}
         graphData={graphData}
-        // cooldownTime={Infinity}
-        d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0.8}
+        cooldownTime={isFree || graphData?.hasCycle ? Infinity : 5000}
+        d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0}
         linkColor={() => "#353945"}
         linkWidth={1.5}
         linkDirectionalArrowLength={5}
@@ -203,8 +203,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         // linkCurvature={0.25}
         nodeColor={(node) => node.color}
         nodeLabel={isDebug ? undefined : "id"}
-        onNodeDragEnd={(node) => {
-          if (node.y && node.y > -50) {
+        onNodeDragEnd={(node, translate) => {
+          if (!isFree && node.y && node.y > -50) {
             node.y = -Math.abs(node.y);
           }
         }}
