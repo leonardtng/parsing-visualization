@@ -106,7 +106,14 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             // }
 
             if (!newGraphData.hasCycle) {
+              const baseLayerLength = new Set(
+                newGraphData?.nodes
+                  .filter((node) => node.leafStart !== undefined)
+                  .map((node) => node.leafStart)
+              ).size;
+
               if (node.level !== undefined) node.fy = -node.level * 50;
+              node.x = (baseLayerLength * BASE_LAYER_SEPARATION) / 2;
             } else {
               const baseLayerLength = new Set(
                 newGraphData?.nodes
@@ -120,6 +127,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
           }
         });
       });
+
+      // fg.d3Force("charge")?.strength(-100);
     }
 
     // // Generate nodes
@@ -162,7 +171,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       }`}
     >
       <div className="absolute top-0 left-0 z-10 flex justify-center w-full">
-        <div className="w-full max-w-[500px] md:max-w-none flex justify-between items-center gap-2">
+        <div className="w-full max-w-[500px] md:max-w-none flex flex-col items-end gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xs">Free</span>
             <Switch
