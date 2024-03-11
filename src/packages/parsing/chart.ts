@@ -6,6 +6,7 @@ import {
   Terminal,
 } from "@/packages/grammar";
 import { Item } from "@/packages/parsing";
+import { Grammar } from "@/types";
 
 export interface GraphNode {
   id: string;
@@ -21,6 +22,9 @@ export interface GraphNode {
   color?: string;
   name?: string;
   isSymbol?: boolean;
+  isEpsilon?: boolean;
+
+  hoverTooltip?: (grammar: Grammar) => string;
 }
 
 export interface GraphLink {
@@ -244,11 +248,13 @@ export class Chart {
               id: JSON.stringify(thing),
               isSymbol: false,
               color: "#003f5c",
-              name: `${thing.lhs.name} ➜ ${
-                thing.rhs.elements
-                  .map((e) => (e.symbol as Terminal | Nonterminal).name)
-                  .join(" ") || '""'
-              } [${thing.positions.join(",")}]`,
+              name: "Production Entry",
+              hoverTooltip: (grammar: Grammar) =>
+                `${thing.lhs.name} ➜ ${
+                  thing.rhs.elements
+                    .map((e) => (e.symbol as Terminal | Nonterminal).name)
+                    .join(" ") || '""'
+                } [${thing.positions.join(",")}]`,
             });
 
             links.push({
@@ -267,6 +273,7 @@ export class Chart {
       });
     });
 
+    // Actual Nodes
     [...this.symbols.entries()].forEach(([start, rows]) => {
       [...rows.entries()].forEach(([end, symbols]) => {
         symbols.forEach((symbol) => {
@@ -277,12 +284,17 @@ export class Chart {
                 ? start + end // fix epsilon symbols in between symbols
                 : undefined,
             isSymbol: true,
+            isEpsilon: start === end,
             id: JSON.stringify({
               start,
               end,
               symbol,
             }),
             color: symbol instanceof Terminal ? "#ff6361" : "#58508d",
+            hoverTooltip: (grammar: Grammar) =>
+              grammar.data.directory?.[
+                (symbol as Terminal | Nonterminal).name
+              ] ?? "",
           });
         });
       });

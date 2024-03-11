@@ -44,7 +44,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     setIsDebug(event.target.checked);
   };
 
-  const { chart } = useParsingContext();
+  const { chart, grammar } = useParsingContext();
 
   const graphData: GraphData | undefined = useMemo(() => {
     const fg = fgRef?.current;
@@ -211,23 +211,21 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         // linkDirectionalArrowRelPos={1}
         // linkCurvature={0.25}
         nodeColor={(node) => node.color}
-        nodeLabel={isDebug ? undefined : "id"}
-        onNodeDragEnd={(node, translate) => {
-          if (!isFree && node.y && node.y > -50) {
-            node.y = -Math.abs(node.y);
-          }
+        nodeLabel={(node) => (isDebug ? "" : node.hoverTooltip(grammar))}
+        onNodeHover={(node) => {
+          document.body.style.cursor = node ? "pointer" : "default";
         }}
         height={dimensions.height}
         width={dimensions.width}
         nodeCanvasObject={(node, ctx, globalScale) => {
           if (!node) return;
-          const label = (isDebug ? node.id : node.name) as string;
-          const fontSize = 14 / globalScale;
+          let label = (isDebug ? node.id : node.name) as string;
+          const fontSize = Math.min(14 / globalScale, 14);
           ctx.font = `${fontSize}px Sans-Serif`;
 
-          const nodeScale = 11 / globalScale;
+          const nodeScale = Math.min(11 / globalScale, 11);
 
-          if (node.isSymbol) {
+          if (node.isSymbol && !node.isEpsilon) {
             ctx.beginPath();
             ctx.arc(node.x!, node.y!, nodeScale * 1.4, 0, 2 * Math.PI, false);
             ctx.fillStyle = node.color;
@@ -246,6 +244,9 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             ctx.fill();
 
             ctx.fillStyle = node.color;
+
+            if (isDebug)
+              ctx.fillText(label, node.x as number, node.y as number);
           }
 
           // const textWidth = ctx.measureText(label).width;

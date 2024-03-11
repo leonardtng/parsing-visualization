@@ -1,10 +1,6 @@
 {
   "start": "CD",
   "productionMap": {
-    "chars": [
-      ["c1", ["chars"]],
-      ["c2", []]
-    ],
     "CD": [["cd", ["AM", "class", "ID", "{", "CB", "}"]]],
     "AM": [
       ["am1", ["public"]],
@@ -62,7 +58,8 @@
       ["ab", ["int"]],
       ["ac", ["boolean"]],
       ["ad", ["void"]],
-      ["ae", ["ID"]]
+      ["ae", ["char"]],
+      ["af", ["ID"]]
     ],
     "L": [
       ["af", ["NL"]],
@@ -116,6 +113,7 @@
     ["protected", "protected"],
     ["int", "int"],
     ["void", "void"],
+    ["char", "char"],
     ["boolean", "boolean"],
     ["class", "class"],
     ["bool", "(true|false)"],
