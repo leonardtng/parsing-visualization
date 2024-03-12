@@ -25,6 +25,7 @@ export interface GraphNode {
   isEpsilon?: boolean;
 
   hoverTooltip?: (grammar: Grammar) => string;
+  children?: GraphNode[];
 }
 
 export interface GraphLink {
@@ -261,6 +262,13 @@ export class Chart {
               source: JSON.stringify(parent),
               target: JSON.stringify(thing),
             });
+            console.log(
+              {
+                source: JSON.stringify(parent),
+                target: JSON.stringify(thing),
+              },
+              links
+            );
 
             children.forEach((child) => {
               links.push({
@@ -414,6 +422,7 @@ export class Chart {
         maxLevel = Math.max(maxLevel, this.getNodeLevel(node, nodes, links));
       });
 
+      node.children = children;
       node.level = maxLevel + 1;
     }
     return node.level;

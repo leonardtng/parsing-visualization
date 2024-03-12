@@ -69,6 +69,8 @@ export const useGetCellData = () => {
     rowIndex: number,
     colIndex: number
   ) => {
+    if (rowIndex === colIndex) return { cell: " ", tooltip: "" };
+
     if (showMostRelevant) {
       if (rowIndex === 0 && colIndex === gridSize - 1) {
         const cell = getDisplayedNode(col);

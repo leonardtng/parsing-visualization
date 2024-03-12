@@ -1,6 +1,7 @@
 import React, {
   ComponentProps,
   FC,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -11,6 +12,7 @@ import { Switch } from "@/components";
 import { useParsingContext } from "@/constants";
 import * as d3 from "d3";
 import { useWindowSize } from "@/helpers";
+import { GraphLink, GraphNode } from "@/packages";
 
 const BASE_LAYER_SEPARATION = 30;
 
@@ -53,43 +55,6 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
 
     const newGraphData = chart?.generateGraphData();
 
-    // Deactivate existing force
-    // fg.d3Force("center", () => {});
-    // fg.d3Force("charge")?.forceManyBody().strength(-100);
-
-    // Add collision and bounding box forces
-    // fg.d3Force("collide", d3.forceCollide(4));
-
-    // fg.d3Force("box", () => {
-    //   newGraphData?.nodes.forEach((node) => {
-    //     if (node.leafStart !== undefined) {
-    //       // Leaves (Terminals)
-    //       node.fx = 100 * node.leafStart;
-    //       node.fy = 0;
-    //     } else {
-    //       // Things and Nonterminals
-    //       if (node.y && node.y > -50) {
-    //         node.y = -50;
-    //       }
-    //     }
-    //   });
-    // });
-
-    // fg.d3Force("collide", d3.forceCollide(4));
-
-    // fg.d3Force("box", () => {
-    //   const SQUARE_HALF_SIDE = 80 * 2;
-
-    //   newGraphData?.nodes.forEach((node) => {
-    //     const x = node.x || 0,
-    //       y = node.y || 0;
-
-    //     if (y > -50) {
-    //       node.vy *= -1;
-    //     }
-    //   });
-    // });
-
     if (!isFree) {
       fg.d3Force("custom", () => {
         newGraphData?.nodes.forEach((node) => {
@@ -127,21 +92,68 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
           }
         });
       });
-
-      // fg.d3Force("charge")?.strength(-100);
     }
-
-    // // Generate nodes
-    // const nodes = [...Array(N).keys()].map(() => ({
-    //   // Initial velocity in random direction
-    //   vx: Math.random() * 2 - 1,
-    //   vy: Math.random() * 2 - 1,
-    //   x: undefined,
-    //   y: undefined,
-    // }));
 
     return newGraphData;
   }, [chart, isFree]);
+
+  const [highlightNodes, setHighlightNodes] = useState<Set<string | null>>(
+    new Set()
+  );
+  const [highlightLinks, setHighlightLinks] = useState<Set<GraphLink | null>>(
+    new Set()
+  );
+  const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
+
+  const updateHighlight = () => {
+    setHighlightNodes(highlightNodes);
+    setHighlightLinks(highlightLinks);
+  };
+
+  const handleNodeHover = (node: GraphNode) => {
+    document.body.style.cursor = node ? "pointer" : "default";
+    highlightNodes.clear();
+    highlightLinks.clear();
+
+    const highlightAllChildren = (node: GraphNode) => {
+      if (node.children) {
+        node.children.forEach((child) => {
+          highlightNodes.add(child.id);
+          highlightAllChildren(child);
+        });
+      }
+    };
+
+    if (node) {
+      highlightNodes.add(node.id);
+      highlightAllChildren(node);
+    }
+
+    graphData?.links.forEach((link) => {
+      const source = link.source as GraphNode;
+      const target = link.target as GraphNode;
+
+      if (highlightNodes.has(source.id) && highlightNodes.has(target.id)) {
+        highlightLinks.add(link as GraphLink);
+      }
+    });
+
+    setHoverNode(node || null);
+    updateHighlight();
+  };
+  console.log(highlightLinks);
+  const handleLinkHover = (link: GraphLink) => {
+    highlightNodes.clear();
+    highlightLinks.clear();
+
+    if (link) {
+      // highlightLinks.add(link);
+      highlightNodes.add(link.source);
+      highlightNodes.add(link.target);
+    }
+
+    updateHighlight();
+  };
 
   const [dimensions, setDimensions] = useState({
     width: 0,
@@ -205,25 +217,40 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         graphData={graphData}
         cooldownTime={isFree || graphData?.hasCycle ? Infinity : 5000}
         d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0}
-        linkColor={() => "#353945"}
-        linkWidth={1.5}
+        linkColor={(link) =>
+          highlightLinks.has(link as unknown as GraphLink)
+            ? "#FF3131"
+            : "#353945"
+        }
+        linkWidth={(link) =>
+          highlightLinks.has(link as unknown as GraphLink) ? 2 : 1.5
+        }
+        linkDirectionalParticles={(link) =>
+          highlightLinks.has(link as unknown as GraphLink) ? 4 : 0
+        }
         linkDirectionalArrowLength={5}
         // linkDirectionalArrowRelPos={1}
         // linkCurvature={0.25}
         nodeColor={(node) => node.color}
         nodeLabel={(node) => (isDebug ? "" : node.hoverTooltip(grammar))}
-        onNodeHover={(node) => {
-          document.body.style.cursor = node ? "pointer" : "default";
-        }}
+        // onNodeHover={(node) => {
+        //   document.body.style.cursor = node ? "pointer" : "default";
+        // }}
+        nodeRelSize={2}
         height={dimensions.height}
         width={dimensions.width}
         nodeCanvasObject={(node, ctx, globalScale) => {
           if (!node) return;
           let label = (isDebug ? node.id : node.name) as string;
-          const fontSize = Math.min(14 / globalScale, 14);
-          ctx.font = `${fontSize}px Sans-Serif`;
 
-          const nodeScale = Math.min(11 / globalScale, 11);
+          const nodeScale = highlightNodes.has(node.id as string)
+            ? Math.min(12 / globalScale, 12)
+            : Math.min(9 / globalScale, 9);
+          const fontSize = highlightNodes.has(node.id as string)
+            ? Math.min(16 / globalScale, 16)
+            : Math.min(14 / globalScale, 14);
+
+          ctx.font = `${fontSize}px Sans-Serif`;
 
           if (node.isSymbol && !node.isEpsilon) {
             ctx.beginPath();
@@ -248,26 +275,12 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             if (isDebug)
               ctx.fillText(label, node.x as number, node.y as number);
           }
-
-          // const textWidth = ctx.measureText(label).width;
-          // const bckgDimensions = [textWidth, fontSize].map(
-          //   (n) => n + fontSize * 0.2
-          // ); // some padding
-
-          // ctx.fillStyle = node.color;
-          // ctx.fillRect(
-          //   node.x - bckgDimensions[0] / 2,
-          //   node.y - bckgDimensions[1] / 2,
-          //   ...bckgDimensions
-          // );
-
-          // ctx.textAlign = "center";
-          // ctx.textBaseline = "middle";
-
-          // ctx.fillText(label, node.x as number, node.y as number);
-
-          // node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
         }}
+        nodeCanvasObjectMode={(node) => {
+          if (!node.id) return;
+          return highlightNodes.has(node.id.toString()) ? "after" : "replace";
+        }}
+        onNodeHover={(node) => handleNodeHover(node as GraphNode)}
       />
     </div>
   );
