@@ -64,12 +64,6 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             node.fy = 0;
           } else {
             // Things and Nonterminals
-            // if (node.y && node.y > -50) {
-            //   // if (node.id === `{"start":0,"end":1,"symbol":{"name":"S"}}`)
-            //   //   console.log(node.vy);
-            //   node.vy = -50;
-            // }
-
             if (!newGraphData.hasCycle) {
               const baseLayerLength = new Set(
                 newGraphData?.nodes
@@ -141,7 +135,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     setHoverNode(node || null);
     updateHighlight();
   };
-  console.log(highlightLinks);
+
   const handleLinkHover = (link: GraphLink) => {
     highlightNodes.clear();
     highlightLinks.clear();
