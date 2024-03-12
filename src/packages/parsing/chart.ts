@@ -262,13 +262,6 @@ export class Chart {
               source: JSON.stringify(parent),
               target: JSON.stringify(thing),
             });
-            console.log(
-              {
-                source: JSON.stringify(parent),
-                target: JSON.stringify(thing),
-              },
-              links
-            );
 
             children.forEach((child) => {
               links.push({
