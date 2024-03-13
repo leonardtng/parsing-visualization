@@ -250,12 +250,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             isDebug ? (node.isEpsilon ? "" : node.id) : node.name(tokens)
           ) as string;
 
-          const nodeScale = highlightNodes.has(node.id as string)
-            ? Math.min(12 / globalScale, 12)
-            : Math.min(9 / globalScale, 9);
-          const fontSize = highlightNodes.has(node.id as string)
-            ? Math.min(16 / globalScale, 16)
-            : Math.min(14 / globalScale, 14);
+          const nodeScale = Math.max(Math.min(9 / globalScale, 9), 3);
+          const fontSize = Math.max(Math.min(14 / globalScale, 14), 2);
 
           if (node.isSymbol && !node.isEpsilon) {
             if (!node.isTerminal) {
@@ -270,7 +266,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
               ctx.beginPath();
               const textWidth = ctx.measureText(label).width;
               const bckgDimensions = [textWidth, fontSize].map(
-                (n) => n + fontSize * 0.8
+                (n) => n + fontSize * 1.5
               );
               ctx.fillStyle = highlightNodes.has(node.id as string)
                 ? "#ff6361"
