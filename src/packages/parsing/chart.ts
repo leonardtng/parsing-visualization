@@ -305,7 +305,7 @@ export class Chart {
               end,
               symbol,
             }),
-            color: symbol instanceof Terminal ? "#003f5c" : "#58508d",
+            color: symbol instanceof Terminal ? "#2f4b7c" : "#58508d",
             hoverTooltip: (grammar: Grammar, tokens: Token[]) => {
               const tokenName =
                 grammar.data.directory?.[

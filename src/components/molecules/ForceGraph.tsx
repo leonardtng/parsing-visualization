@@ -1,7 +1,6 @@
 import React, {
   ComponentProps,
   FC,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -234,7 +233,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
 
             return `<div style="max-width: 300px">
             <div style="color: #ff6361"><b>${label}</b></div>
-            <div style="font-family: monospace">${content}</div>
+            <div style="font-family: monospace">${content ?? ""}</div>
           </div>`;
           }
         }}
@@ -251,6 +250,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
           ) as string;
 
           const nodeScale = Math.max(Math.min(9 / globalScale, 9), 3);
+          const nodeScaleSmall = Math.max(Math.min(3 / globalScale, 3), 1.5);
           const fontSize = Math.max(Math.min(14 / globalScale, 14), 2);
 
           if (node.isSymbol && !node.isEpsilon) {
@@ -290,8 +290,17 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             ctx.fillText(label, node.x as number, node.y as number);
           } else {
             ctx.beginPath();
-            ctx.arc(node.x!, node.y!, 1 * 1.4, 0, 2 * Math.PI, false);
-            ctx.fillStyle = node.color;
+            ctx.arc(
+              node.x!,
+              node.y!,
+              nodeScaleSmall * 1.4,
+              0,
+              2 * Math.PI,
+              false
+            );
+            ctx.fillStyle = highlightNodes.has(node.id as string)
+              ? "#ffa600"
+              : node.color;
             ctx.fill();
 
             ctx.fillStyle = node.color;
