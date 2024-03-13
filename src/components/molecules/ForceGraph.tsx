@@ -7,9 +7,10 @@ import React, {
   useState,
 } from "react";
 import { ForceGraph2D } from "react-force-graph";
-import { Switch } from "@/components";
+import { Button, RefreshIcon, Switch } from "@/components";
 import { useParsingContext } from "@/constants";
 import * as d3 from "d3";
+import cloneDeep from "lodash/cloneDeep";
 import { useWindowSize } from "@/helpers";
 import {
   GraphLink,
@@ -57,14 +58,18 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     tokens,
     handleHighlightedBlock,
     clearHighlightedBlock,
+    input,
+    onInputChange,
   } = useParsingContext();
+
+  const raw = useMemo(() => chart?.generateGraphData(), [chart]);
 
   const graphData: GraphData | undefined = useMemo(() => {
     const fg = fgRef?.current;
 
     if (!fg) return;
 
-    const newGraphData = chart?.generateGraphData();
+    const newGraphData = cloneDeep(raw);
 
     if (!isFree) {
       fg.d3Force("custom", () => {
@@ -100,7 +105,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     }
 
     return newGraphData;
-  }, [chart, isFree]);
+  }, [isFree, raw]);
 
   const [highlightNodes, setHighlightNodes] = useState<Set<string | null>>(
     new Set()
@@ -184,7 +189,9 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
 
   useEffect(() => {
     setTimeout(() => fgRef.current?.zoomToFit(500, 50), 500);
-  }, [chart]);
+  }, [chart, isFree]);
+
+  const [isSpinning, setIsSpinning] = useState<boolean>(false);
 
   return (
     <div
@@ -194,31 +201,58 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       }`}
     >
       <div className="absolute top-0 left-0 z-10 flex justify-center w-full">
-        <div className="w-full max-w-[500px] md:max-w-none flex flex-col items-end gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs">Free</span>
-            <Switch
-              checked={isFree}
-              onChange={handleChangeIsFree}
-              className={`${
-                isFree
-                  ? "[&_.switchCasing]:bg-success"
-                  : "[&_.switchCasing]:bg-gray-300"
-              }`}
-            />
-          </div>
+        <div className="w-full max-w-[500px] md:max-w-none flex justify-between items-start gap-3">
+          <Button
+            className="flex items-center gap-2"
+            onClick={() => {
+              if (isSpinning) return;
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs">Debug</span>
-            <Switch
-              checked={isDebug}
-              onChange={handleChangeDebug}
-              className={`${
-                isDebug
-                  ? "[&_.switchCasing]:bg-success"
-                  : "[&_.switchCasing]:bg-gray-300"
-              }`}
-            />
+              setIsSpinning(true);
+              setTimeout(() => setIsSpinning(false), 1000);
+
+              const tempInput = input;
+              onInputChange("");
+              setTimeout(() => onInputChange(tempInput), 1000);
+
+              setTimeout(() => fgRef.current?.zoomToFit(500, 50), 500);
+            }}
+          >
+            <Button className={isSpinning ? `animate-ease-spin` : ""}>
+              <RefreshIcon
+                width={14}
+                height={14}
+                className="[&_path]:stroke-fontPrimary"
+              />
+            </Button>
+            <div className="text-sm">Reset View</div>
+          </Button>
+
+          <div className="flex flex-col items-end gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs">Free</span>
+              <Switch
+                checked={isFree}
+                onChange={handleChangeIsFree}
+                className={`${
+                  isFree
+                    ? "[&_.switchCasing]:bg-success"
+                    : "[&_.switchCasing]:bg-gray-300"
+                }`}
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs">Debug</span>
+              <Switch
+                checked={isDebug}
+                onChange={handleChangeDebug}
+                className={`${
+                  isDebug
+                    ? "[&_.switchCasing]:bg-success"
+                    : "[&_.switchCasing]:bg-gray-300"
+                }`}
+              />
+            </div>
           </div>
         </div>
       </div>

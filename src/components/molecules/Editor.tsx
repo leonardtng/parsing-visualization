@@ -153,7 +153,7 @@ const Editor = () => {
     <div className="flex-1 w-full max-w-[500px] md:max-w-none h-full md:h-auto">
       <AceEditor
         ref={ref as any}
-        theme="monokai"
+        theme="twilight"
         value={input}
         onChange={onInputChange}
         name="editor"
@@ -162,6 +162,7 @@ const Editor = () => {
         width="100%"
         markers={markers}
         highlightActiveLine={false}
+        className="[&_.ace_editor]:bg-opacity-20"
       />
     </div>
   );

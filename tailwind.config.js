@@ -62,6 +62,10 @@ module.exports = {
         strokePrimary: "#353945",
         strokeSecondary: "#CBCBCB",
       },
+
+      animation: {
+        "ease-spin": "spin 1s ease",
+      },
     },
   },
   plugins: [tailwindUtils],

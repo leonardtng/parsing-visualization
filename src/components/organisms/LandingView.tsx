@@ -30,7 +30,7 @@ const LandingView = () => {
   const tabs: TabData[] = useMemo(
     () => [
       {
-        label: "Force",
+        label: "Force-Directed Graph",
         Content: () => <></>,
       },
       {
@@ -44,7 +44,7 @@ const LandingView = () => {
   return (
     <div className="w-full h-screen flex flex-col items-center gap-3 md:gap-6 pt-8 overflow-hidden z-0">
       <div className="flex-1 flex flex-col md:flex-row md:gap-12 items-center md:items-start gap-5 w-full overflow-hidden z-0">
-        <div className="h-auto md:h-full min-w-none w-[95vw] md:w-[40%] md:min-w-[40%] md:pl-12 md:pb-12 flex flex-col gap-8 items-center z-10">
+        <div className="h-auto md:h-full min-w-none w-[95vw] md:w-[30%] md:min-w-[30%] md:pl-12 md:pb-12 flex flex-col gap-8 items-center z-10">
           <div className="flex flex-col items-center gap-3">
             <div className="font-bold text-xl mb-1">Parsing Visualization</div>
             <GrammarSelector showFilter={activeTabIndex === 1} />
@@ -72,7 +72,7 @@ const LandingView = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
-        className="fixed rounded-full bg-background z-0"
+        className="fixed rounded-full bg-background -z-10"
         style={{
           top: winHeight + 60,
           width: winWidth,
