@@ -46,7 +46,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     setIsDebug(event.target.checked);
   };
 
-  const { chart, grammar } = useParsingContext();
+  const { chart, grammar, tokens } = useParsingContext();
 
   const graphData: GraphData | undefined = useMemo(() => {
     const fg = fgRef?.current;
@@ -213,7 +213,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0}
         linkColor={(link) =>
           highlightLinks.has(link as unknown as GraphLink)
-            ? "#FF3131"
+            ? "#ff6361"
             : "#353945"
         }
         linkWidth={(link) =>
@@ -226,7 +226,18 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         // linkDirectionalArrowRelPos={1}
         // linkCurvature={0.25}
         nodeColor={(node) => node.color}
-        nodeLabel={(node) => (isDebug ? "" : node.hoverTooltip(grammar))}
+        nodeLabel={(node) => {
+          if (isDebug) {
+            return "";
+          } else {
+            const [label, content] = node.hoverTooltip(grammar, tokens);
+
+            return `<div style="max-width: 300px">
+            <div style="color: #ff6361"><b>${label}</b></div>
+            <div style="font-family: monospace">${content}</div>
+          </div>`;
+          }
+        }}
         // onNodeHover={(node) => {
         //   document.body.style.cursor = node ? "pointer" : "default";
         // }}
@@ -235,7 +246,9 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         width={dimensions.width}
         nodeCanvasObject={(node, ctx, globalScale) => {
           if (!node) return;
-          let label = (isDebug ? node.id : node.name) as string;
+          let label = (
+            isDebug ? (node.isEpsilon ? "" : node.id) : node.name(tokens)
+          ) as string;
 
           const nodeScale = highlightNodes.has(node.id as string)
             ? Math.min(12 / globalScale, 12)
@@ -244,13 +257,34 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             ? Math.min(16 / globalScale, 16)
             : Math.min(14 / globalScale, 14);
 
-          ctx.font = `${fontSize}px Sans-Serif`;
-
           if (node.isSymbol && !node.isEpsilon) {
-            ctx.beginPath();
-            ctx.arc(node.x!, node.y!, nodeScale * 1.4, 0, 2 * Math.PI, false);
-            ctx.fillStyle = node.color;
-            ctx.fill();
+            if (!node.isTerminal) {
+              ctx.beginPath();
+              ctx.arc(node.x!, node.y!, nodeScale * 1.4, 0, 2 * Math.PI, false);
+              ctx.fillStyle = highlightNodes.has(node.id as string)
+                ? "#ff6361"
+                : node.color;
+              ctx.fill();
+              ctx.font = `${fontSize}px Sans-Serif`;
+            } else {
+              ctx.beginPath();
+              const textWidth = ctx.measureText(label).width;
+              const bckgDimensions = [textWidth, fontSize].map(
+                (n) => n + fontSize * 0.8
+              );
+              ctx.fillStyle = highlightNodes.has(node.id as string)
+                ? "#ff6361"
+                : node.color;
+              ctx.roundRect(
+                node.x! - bckgDimensions[0] / 2,
+                node.y! - bckgDimensions[1] / 2,
+                // @ts-ignore
+                ...bckgDimensions,
+                5 / globalScale
+              );
+              ctx.fill();
+              ctx.font = `${fontSize}px monospace`;
+            }
 
             ctx.fillStyle = "#fff";
 

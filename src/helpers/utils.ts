@@ -297,3 +297,14 @@ export const useTieredEffect = () => {
 
   return tieredEffect;
 };
+
+export const shortenString = (
+  str: string | null | undefined,
+  degree: number = 3
+) => {
+  return str
+    ? str.length > degree * 2 + 3
+      ? `${str.slice(0, degree)}...${str.slice(-degree)}`
+      : str
+    : "";
+};

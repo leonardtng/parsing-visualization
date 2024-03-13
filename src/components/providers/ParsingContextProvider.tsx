@@ -12,7 +12,7 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
   const [input, setInput] = useState<string>("");
   const [grammar, setGrammar] = useState<Grammar>(GRAMMARS[0]);
   const grammarOptions = useMemo(() => GRAMMARS, []);
-  const { chart, directory } = useParser(grammar, input);
+  const { chart, directory, tokens } = useParser(grammar, input);
 
   const onInputChange = (input: string) => {
     setInput(input);
@@ -59,6 +59,7 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
         selectGrammar,
         grammarOptions,
         chart,
+        tokens,
         directory,
         getDisplayedNode,
         showMostRelevant,

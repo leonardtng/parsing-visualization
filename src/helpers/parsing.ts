@@ -40,7 +40,7 @@ export const useParser = (grammar: Grammar, input: string) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grammar, input]);
 
-  return { chart, directory };
+  return { chart, directory, tokens };
 };
 
 export const useAnalyzeParse = () => {

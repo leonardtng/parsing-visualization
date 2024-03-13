@@ -6,7 +6,9 @@ import {
   Terminal,
 } from "@/packages/grammar";
 import { Item } from "@/packages/parsing";
+import { Token } from "@/packages/lexing";
 import { Grammar } from "@/types";
+import { shortenString } from "@/helpers";
 
 export interface GraphNode {
   id: string;
@@ -20,11 +22,12 @@ export interface GraphNode {
   level?: number;
   leafStart?: number;
   color?: string;
-  name?: string;
-  isSymbol?: boolean;
-  isEpsilon?: boolean;
+  name?: (tokens: Token[]) => string;
+  isSymbol?: boolean; // full node symbols
+  isTerminal?: boolean; // terminal symbols (rooted at bottom of tree)
+  isEpsilon?: boolean; // epsilon symbols (rooted at bottom of tree)
 
-  hoverTooltip?: (grammar: Grammar) => string;
+  hoverTooltip?: (grammar: Grammar, tokens: Token[]) => string[];
   children?: GraphNode[];
 }
 
@@ -249,13 +252,14 @@ export class Chart {
               id: JSON.stringify(thing),
               isSymbol: false,
               color: "#003f5c",
-              name: "Production Entry",
-              hoverTooltip: (grammar: Grammar) =>
+              name: (tokens) => "Production Entry",
+              hoverTooltip: (grammar: Grammar, tokens: Token[]) => [
                 `${thing.lhs.name} ➜ ${
                   thing.rhs.elements
                     .map((e) => (e.symbol as Terminal | Nonterminal).name)
                     .join(" ") || '""'
                 } [${thing.positions.join(",")}]`,
+              ],
             });
 
             links.push({
@@ -279,23 +283,46 @@ export class Chart {
       [...rows.entries()].forEach(([end, symbols]) => {
         symbols.forEach((symbol) => {
           nodes.push({
-            name: (symbol as Terminal | Nonterminal).name,
+            name: (tokens: Token[]) => {
+              if (symbol instanceof Nonterminal) {
+                return symbol.name;
+              } else {
+                const matchResult =
+                  tokens[start]?.matchResult ?? (symbol as Terminal).name;
+
+                return shortenString(matchResult[0]);
+              }
+            },
             leafStart:
               symbol instanceof Terminal || start === end
                 ? start + end // fix epsilon symbols in between symbols
                 : undefined,
             isSymbol: true,
+            isTerminal: symbol instanceof Terminal,
             isEpsilon: start === end,
             id: JSON.stringify({
               start,
               end,
               symbol,
             }),
-            color: symbol instanceof Terminal ? "#ff6361" : "#58508d",
-            hoverTooltip: (grammar: Grammar) =>
-              grammar.data.directory?.[
-                (symbol as Terminal | Nonterminal).name
-              ] ?? "",
+            color: symbol instanceof Terminal ? "#003f5c" : "#58508d",
+            hoverTooltip: (grammar: Grammar, tokens: Token[]) => {
+              const tokenName =
+                grammar.data.directory?.[
+                  (symbol as Terminal | Nonterminal).name
+                ] ?? "";
+
+              const nodeTokens = tokens.slice(start, end);
+
+              const block = nodeTokens.reduce((acc, curr) => {
+                if (curr.matchResult) {
+                  return acc + " " + curr.matchResult[0];
+                }
+                return acc;
+              }, "");
+
+              return [`${tokenName}`, `${block}`];
+            },
           });
         });
       });
