@@ -12,8 +12,16 @@ export interface ParsingContext {
   tokens: Token[];
   directory: { [key: string]: string } | undefined;
   getDisplayedNode: (col: Symbol[] | null) => string;
+
   showMostRelevant: boolean;
   toggleShowMostRelevant: () => void;
+
+  mergeHighlights: boolean;
+  toggleMergeHighlights: () => void;
+
+  highlightedBlock: Token[];
+  handleHighlightedBlock: (block: Token[]) => void;
+  clearHighlightedBlock: () => void;
 }
 
 export const ParsingContext = createContext<ParsingContext>({
@@ -30,8 +38,16 @@ export const ParsingContext = createContext<ParsingContext>({
   tokens: [],
   directory: undefined,
   getDisplayedNode: () => "",
+
   showMostRelevant: true,
   toggleShowMostRelevant: () => {},
+
+  mergeHighlights: true,
+  toggleMergeHighlights: () => {},
+
+  highlightedBlock: [],
+  handleHighlightedBlock: () => {},
+  clearHighlightedBlock: () => {},
 });
 
 export const useParsingContext = () => useContext(ParsingContext);

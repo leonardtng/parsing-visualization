@@ -29,6 +29,8 @@ export interface GraphNode {
 
   hoverTooltip?: (grammar: Grammar, tokens: Token[]) => string[];
   children?: GraphNode[];
+
+  getStartEnd?: [number, number];
 }
 
 export interface GraphLink {
@@ -323,6 +325,7 @@ export class Chart {
 
               return [`${tokenName}`, `${block}`];
             },
+            getStartEnd: [start, end],
           });
         });
       });

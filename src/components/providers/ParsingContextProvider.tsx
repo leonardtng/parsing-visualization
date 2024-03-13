@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useCallback, useMemo, useState } from "react";
-import { Nonterminal, Symbol, Terminal } from "@/packages";
+import { Nonterminal, Symbol, Terminal, Token } from "@/packages";
 import { GRAMMARS, ParsingContext } from "@/constants";
 import { Grammar } from "@/types";
 import { useParser } from "@/helpers/parsing";
@@ -50,6 +50,20 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
     setShowMostRelevant((prev) => !prev);
   };
 
+  const [mergeHighlights, setMergeHighlights] = useState<boolean>(true);
+  const toggleMergeHighlights = () => {
+    setMergeHighlights((prev) => !prev);
+  };
+
+  const [highlightedBlock, setHighlightedBlock] = useState<Token[]>([]);
+  const handleHighlightedBlock = (block: Token[]) => {
+    setHighlightedBlock(block);
+  };
+
+  const clearHighlightedBlock = () => {
+    setHighlightedBlock([]);
+  };
+
   return (
     <ParsingContext.Provider
       value={{
@@ -62,8 +76,16 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
         tokens,
         directory,
         getDisplayedNode,
+
         showMostRelevant,
         toggleShowMostRelevant,
+
+        mergeHighlights,
+        toggleMergeHighlights,
+
+        highlightedBlock,
+        handleHighlightedBlock,
+        clearHighlightedBlock,
       }}
     >
       {children}

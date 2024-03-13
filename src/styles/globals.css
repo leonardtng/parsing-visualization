@@ -56,3 +56,8 @@ body {
 .rd3t-label__title {
   fill: #9B9B9B !important;
 }
+
+.ace-marker {
+  position: absolute;
+  background-color: #ff6361;
+}

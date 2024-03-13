@@ -45,7 +45,13 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     setIsDebug(event.target.checked);
   };
 
-  const { chart, grammar, tokens } = useParsingContext();
+  const {
+    chart,
+    grammar,
+    tokens,
+    handleHighlightedBlock,
+    clearHighlightedBlock,
+  } = useParsingContext();
 
   const graphData: GraphData | undefined = useMemo(() => {
     const fg = fgRef?.current;
@@ -107,6 +113,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     document.body.style.cursor = node ? "pointer" : "default";
     highlightNodes.clear();
     highlightLinks.clear();
+    clearHighlightedBlock();
 
     const highlightAllChildren = (node: GraphNode) => {
       if (node.children) {
@@ -130,6 +137,11 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         highlightLinks.add(link as GraphLink);
       }
     });
+
+    if (node && node.getStartEnd) {
+      const [start, end] = node.getStartEnd;
+      handleHighlightedBlock(tokens.slice(start, end));
+    }
 
     setHoverNode(node || null);
     updateHighlight();

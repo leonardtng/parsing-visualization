@@ -13,6 +13,8 @@ const GrammarSelector: FC<Props> = ({ showFilter }: Props) => {
     grammarOptions,
     showMostRelevant,
     toggleShowMostRelevant,
+    mergeHighlights,
+    toggleMergeHighlights,
   } = useParsingContext();
 
   const handleChange = (_: SyntheticEvent | null, selected: string) => {
@@ -47,7 +49,20 @@ const GrammarSelector: FC<Props> = ({ showFilter }: Props) => {
           <span className="text-[11px]">Filter Relevant</span>
         </div>
       ) : (
-        <div className="h-[16.5px]" />
+        <div
+          className="flex justify-center items-center cursor-pointer gap-1"
+          onClick={toggleMergeHighlights}
+        >
+          <Checkbox
+            id="show-most-relevant"
+            className="[&_.checkboxBase]:!w-[13px] [&_.checkboxBase]:!h-[13px] 
+            [&_.checkboxBase]:bg-transparent [&_.checkboxBase]:rounded-[4px] 
+            [&_.checkboxInput]:w-[13px] [&_.checkboxInput]:h-[13px] [&_.checkboxBase]:border-strokeSecondary
+            [&_.checkIcon]:w-[7px] [&_.checkIcon]:h-[7px] [&_*]:fill-fontPrimary"
+            checked={mergeHighlights}
+          />
+          <span className="text-[11px]">Merge Highlights</span>
+        </div>
       )}
     </div>
   );
