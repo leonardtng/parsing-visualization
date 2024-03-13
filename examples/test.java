@@ -1,8 +1,9 @@
-public class test {
+public class Test {
     int number;
     
     int main() {
-        if (true) {
+        boolean flag = true;
+        if (flag) {
             return 1;
         }
         return 0;
