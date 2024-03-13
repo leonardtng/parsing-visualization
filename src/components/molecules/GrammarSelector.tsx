@@ -61,7 +61,7 @@ const GrammarSelector: FC<Props> = ({ showFilter }: Props) => {
             [&_.checkIcon]:w-[7px] [&_.checkIcon]:h-[7px] [&_*]:fill-fontPrimary"
             checked={mergeHighlights}
           />
-          <span className="text-[11px]">Merge Highlights</span>
+          <span className="text-[11px]">Highlights Whitespace</span>
         </div>
       )}
     </div>
