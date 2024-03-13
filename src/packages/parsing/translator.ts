@@ -15,6 +15,7 @@ export interface Json {
   whitespace: string;
   terminalRules: [string, string][];
   directory?: { [key: string]: string };
+  defaultInput?: string;
 }
 
 export interface TranslatorOutput {

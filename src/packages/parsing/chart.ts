@@ -10,6 +10,14 @@ import { Token } from "@/packages/lexing";
 import { Grammar } from "@/types";
 import { shortenString } from "@/helpers";
 
+export const HIGHLIGHT_PRIMARY_COLOR = "#ff6361";
+export const HIGHLIGHT_SECONDARY_COLOR = "#ffa600";
+export const LINK_COLOR = "#353945";
+export const TERMINAL_COLOR = "#2f4b7c";
+export const PRODUCTION_ENTRY_COLOR = "#003f5c";
+export const EPSILON_ITEM_COLOR = "#003f5c";
+export const SYMBOL_COLOR = "#58508d";
+
 export interface GraphNode {
   id: string;
   fy?: number;
@@ -253,7 +261,7 @@ export class Chart {
             nodes.push({
               id: JSON.stringify(thing),
               isSymbol: false,
-              color: "#003f5c",
+              color: PRODUCTION_ENTRY_COLOR,
               name: (tokens) => "Production Entry",
               hoverTooltip: (grammar: Grammar, tokens: Token[]) => [
                 `${thing.lhs.name} ➜ ${
@@ -284,10 +292,14 @@ export class Chart {
     [...this.symbols.entries()].forEach(([start, rows]) => {
       [...rows.entries()].forEach(([end, symbols]) => {
         symbols.forEach((symbol) => {
+          const isSymbol = true;
+          const isTerminal = symbol instanceof Terminal;
+          const isEpsilon = start === end;
+
           nodes.push({
             name: (tokens: Token[]) => {
-              if (symbol instanceof Nonterminal) {
-                return symbol.name;
+              if (!isTerminal) {
+                return (symbol as Nonterminal).name;
               } else {
                 const matchResult =
                   tokens[start]?.matchResult ?? (symbol as Terminal).name;
@@ -296,18 +308,22 @@ export class Chart {
               }
             },
             leafStart:
-              symbol instanceof Terminal || start === end
+              isTerminal || isEpsilon
                 ? start + end // fix epsilon symbols in between symbols
                 : undefined,
-            isSymbol: true,
-            isTerminal: symbol instanceof Terminal,
-            isEpsilon: start === end,
+            isSymbol,
+            isTerminal,
+            isEpsilon,
             id: JSON.stringify({
               start,
               end,
               symbol,
             }),
-            color: symbol instanceof Terminal ? "#2f4b7c" : "#58508d",
+            color: isTerminal
+              ? TERMINAL_COLOR
+              : isEpsilon
+              ? EPSILON_ITEM_COLOR
+              : SYMBOL_COLOR,
             hoverTooltip: (grammar: Grammar, tokens: Token[]) => {
               const tokenName =
                 grammar.data.directory?.[
@@ -316,14 +332,30 @@ export class Chart {
 
               const nodeTokens = tokens.slice(start, end);
 
-              const block = nodeTokens.reduce((acc, curr) => {
-                if (curr.matchResult) {
-                  return acc + " " + curr.matchResult[0];
-                }
-                return acc;
-              }, "");
+              const [minStart, maxEnd] = nodeTokens.reduce(
+                (acc, match) => {
+                  const start = match.matchResult.indices[0][0];
+                  const end = match.matchResult.indices[0][1];
 
-              return [`${tokenName}`, `${block}`];
+                  if (start < acc[0]) {
+                    acc[0] = start;
+                  }
+
+                  if (end > acc[1]) {
+                    acc[1] = end;
+                  }
+
+                  return acc;
+                },
+                [Infinity, 0]
+              );
+
+              const codeBlock = nodeTokens?.[0]?.matchResult.input?.slice(
+                minStart,
+                maxEnd
+              );
+
+              return [`${tokenName}`, `${codeBlock}`];
             },
             getStartEnd: [start, end],
           });

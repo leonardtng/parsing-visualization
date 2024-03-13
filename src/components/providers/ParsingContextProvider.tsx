@@ -1,4 +1,11 @@
-import React, { FC, ReactNode, useCallback, useMemo, useState } from "react";
+import React, {
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Nonterminal, Symbol, Terminal, Token } from "@/packages";
 import { GRAMMARS, ParsingContext } from "@/constants";
 import { Grammar } from "@/types";
@@ -9,8 +16,10 @@ interface Props {
 }
 
 const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
-  const [input, setInput] = useState<string>("");
   const [grammar, setGrammar] = useState<Grammar>(GRAMMARS[0]);
+  const [input, setInput] = useState<string>(
+    GRAMMARS[0].data.defaultInput ?? ""
+  );
   const grammarOptions = useMemo(() => GRAMMARS, []);
   const { chart, directory, tokens } = useParser(grammar, input);
 
@@ -20,6 +29,7 @@ const ParsingContextProvider: FC<Props> = ({ children }: Props) => {
 
   const selectGrammar = (grammar: Grammar) => {
     setGrammar(grammar);
+    onInputChange(grammar.data.defaultInput ?? "");
   };
 
   const mapKeys = useMemo(

@@ -10,5 +10,6 @@
   "terminalRules": [
     ["A", "A"],
     ["B", "B"]
-  ]
+  ],
+  "defaultInput": "AABB"
 }

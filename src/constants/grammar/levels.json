@@ -7,5 +7,6 @@
     ]
   },
   "whitespace": "\\s+",
-  "terminalRules": [["X", "X"]]
+  "terminalRules": [["X", "X"]],
+  "defaultInput": "XXX"
 }

@@ -11,7 +11,13 @@ import { Switch } from "@/components";
 import { useParsingContext } from "@/constants";
 import * as d3 from "d3";
 import { useWindowSize } from "@/helpers";
-import { GraphLink, GraphNode } from "@/packages";
+import {
+  GraphLink,
+  GraphNode,
+  HIGHLIGHT_PRIMARY_COLOR,
+  HIGHLIGHT_SECONDARY_COLOR,
+  LINK_COLOR,
+} from "@/packages";
 
 const BASE_LAYER_SEPARATION = 30;
 
@@ -224,8 +230,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0}
         linkColor={(link) =>
           highlightLinks.has(link as unknown as GraphLink)
-            ? "#ff6361"
-            : "#353945"
+            ? HIGHLIGHT_PRIMARY_COLOR
+            : LINK_COLOR
         }
         linkWidth={(link) =>
           highlightLinks.has(link as unknown as GraphLink) ? 2 : 1.5
@@ -244,8 +250,10 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             const [label, content] = node.hoverTooltip(grammar, tokens);
 
             return `<div style="max-width: 300px">
-            <div style="color: #ff6361"><b>${label}</b></div>
-            <div style="font-family: monospace">${content ?? ""}</div>
+            <div style="color: ${HIGHLIGHT_PRIMARY_COLOR}"><b>${label}</b></div>
+            <div><pre style="font-family: monospace">${
+              content ?? ""
+            }</pre></div>
           </div>`;
           }
         }}
@@ -270,7 +278,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
               ctx.beginPath();
               ctx.arc(node.x!, node.y!, nodeScale * 1.4, 0, 2 * Math.PI, false);
               ctx.fillStyle = highlightNodes.has(node.id as string)
-                ? "#ff6361"
+                ? HIGHLIGHT_PRIMARY_COLOR
                 : node.color;
               ctx.fill();
               ctx.font = `${fontSize}px Sans-Serif`;
@@ -281,7 +289,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
                 (n) => n + fontSize * 1.5
               );
               ctx.fillStyle = highlightNodes.has(node.id as string)
-                ? "#ff6361"
+                ? HIGHLIGHT_PRIMARY_COLOR
                 : node.color;
               ctx.roundRect(
                 node.x! - bckgDimensions[0] / 2,
@@ -311,7 +319,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
               false
             );
             ctx.fillStyle = highlightNodes.has(node.id as string)
-              ? "#ffa600"
+              ? HIGHLIGHT_SECONDARY_COLOR
               : node.color;
             ctx.fill();
 
