@@ -30,7 +30,7 @@ const LandingView = () => {
   const tabs: TabData[] = useMemo(
     () => [
       {
-        label: "Force-Directed Graph",
+        label: "Force-Directed Tree / Graph",
         Content: () => <></>,
       },
       {

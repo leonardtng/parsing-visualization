@@ -40,10 +40,10 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef: FGRef = useRef();
 
-  const [isFree, setIsFree] = useState<boolean>(false);
+  const [isTree, setIsTree] = useState<boolean>(true);
 
   const handleChangeIsFree = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsFree(event.target.checked);
+    setIsTree(event.target.checked);
   };
 
   const [isDebug, setIsDebug] = useState<boolean>(false);
@@ -71,7 +71,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
 
     const newGraphData = cloneDeep(raw);
 
-    if (!isFree) {
+    if (isTree) {
       fg.d3Force("custom", () => {
         newGraphData?.nodes.forEach((node) => {
           if (node.leafStart !== undefined) {
@@ -105,7 +105,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     }
 
     return newGraphData;
-  }, [isFree, raw]);
+  }, [isTree, raw]);
 
   const [highlightNodes, setHighlightNodes] = useState<Set<string | null>>(
     new Set()
@@ -189,7 +189,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
 
   useEffect(() => {
     setTimeout(() => fgRef.current?.zoomToFit(500, 50), 500);
-  }, [chart, isFree]);
+  }, [chart, isTree]);
 
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
 
@@ -229,13 +229,13 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
 
           <div className="flex flex-col items-end gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs">Free</span>
+              <span className="text-xs">Tree View</span>
               <Switch
-                checked={isFree}
+                checked={isTree}
                 onChange={handleChangeIsFree}
                 className={`${
-                  isFree
-                    ? "[&_.switchCasing]:bg-success"
+                  isTree
+                    ? "[&_.switchCasing]:bg-primary"
                     : "[&_.switchCasing]:bg-gray-300"
                 }`}
               />
@@ -248,7 +248,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
                 onChange={handleChangeDebug}
                 className={`${
                   isDebug
-                    ? "[&_.switchCasing]:bg-success"
+                    ? "[&_.switchCasing]:bg-primary"
                     : "[&_.switchCasing]:bg-gray-300"
                 }`}
               />
@@ -260,8 +260,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       <ForceGraph2D
         ref={fgRef}
         graphData={graphData}
-        cooldownTime={isFree || graphData?.hasCycle ? Infinity : 5000}
-        d3VelocityDecay={isFree ? 0.05 : graphData?.hasCycle ? 0.01 : 0}
+        cooldownTime={!isTree || graphData?.hasCycle ? Infinity : 5000}
+        d3VelocityDecay={!isTree ? 0.05 : graphData?.hasCycle ? 0.01 : 0}
         linkColor={(link) =>
           highlightLinks.has(link as unknown as GraphLink)
             ? HIGHLIGHT_PRIMARY_COLOR
