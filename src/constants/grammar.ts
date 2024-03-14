@@ -1,6 +1,7 @@
 import { Grammar, GrammarKey } from "@/types";
 import { Json } from "@/packages";
 import json from "./grammar/json.json";
+import jsonFast from "./grammar/json-fast.json";
 import java from "./grammar/java.json";
 import squareBrackets from "./grammar/square-brackets.json";
 import matchingPairs from "./grammar/matching-pairs.json";
@@ -18,6 +19,11 @@ export const GRAMMARS: Grammar[] = [
     label: "JSON",
     data: json as unknown as Json,
   },
+  // {
+  //   key: GrammarKey.JSON_FAST,
+  //   label: "JSON (Increased Performance)",
+  //   data: jsonFast as unknown as Json,
+  // },
   {
     key: GrammarKey.SQUARE_BRACKETS,
     label: "Square Brackets",

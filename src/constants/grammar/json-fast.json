@@ -19,10 +19,7 @@
       ["m", ["mem", ",", "mems"]],
       ["l", ["mem"]]
     ],
-    "mem": [
-      ["n", ["str", ":", "elem"]],
-      ["n", ["num", ":", "elem"]]
-    ],
+    "mem": [["n", ["str", ":", "elem"]]],
     "arr": [
       ["p", ["[", "elems", "]"]],
       ["o", ["[", "]"]]
@@ -32,17 +29,15 @@
       ["q", ["elem"]]
     ],
     "str": [
-      ["s", ["\"", "chars", "\""]],
-      ["s", ["\"", "\""]]
+      ["s", ["\"", "strChars", "\""]],
+      ["s", ["\"", "\""]],
+      ["s", []]
     ],
-    "chars": [
-      ["u", ["char", "chars"]],
-      ["e", []]
-    ],
-    "char": [
-      ["w", ["esc"]],
-      ["w", ["num"]],
-      ["v", ["uni"]]
+    "strChars": [
+      ["t", ["chars", "strChars"]],
+      ["t", ["num", "strChars"]],
+      ["t", ["num"]],
+      ["t", ["chars"]]
     ]
   },
   "directory": {
@@ -55,6 +50,7 @@
     "arr": "array",
     "elems": "elements",
     "str": "string",
+    "strChars": "string characters",
     "chars": "characters",
     "char": "character",
     "bool": "boolean",
@@ -76,7 +72,7 @@
     ["null", "null"],
     ["esc", "(\\\\(\\\"|\\\\|/|b|f|n|r|t|u[0-9a-fA-F]{4}))"],
     ["num", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
-    ["uni", "[\u0020-\u10FFFF&&[^\"\\]]"]
+    ["chars", "[a-zA-Z_][a-zA-Z0-9_]*"]
   ],
-  "defaultInput": "{\n    \"a\": \"Hello World!\",\n    \"b\": [1, 2, 3]\n}"
+  "defaultInput": "{\n    \"a\": \"HelloWorld\",\n    \"b\": [1, 2, 3]\n}"
 }
