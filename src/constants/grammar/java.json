@@ -131,5 +131,5 @@
     ["num", "-?(0|[1-9]\\d*)(\\.\\d+)?([Ee][+-]?\\d+)?"],
     ["chars", "[a-zA-Z_][a-zA-Z0-9_]*"]
   ],
-  "defaultInput": "public class TestInput {\n    int number;\n\n    int main() {\n        boolean flag = true;\n\n        if (flag) {\n            return 1;\n        }\n\n        return 0;\n    }\n}"
+  "defaultInput": "public class SampleClass {\n    int myNum;\n\n    int main() {\n        boolean flag = true;\n\n        if (flag) {\n            return 1;\n        }\n\n        return 0;\n    }\n}"
 }
