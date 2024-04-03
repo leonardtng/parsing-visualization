@@ -12,6 +12,7 @@ import { shortenString } from "@/helpers";
 
 export const HIGHLIGHT_PRIMARY_COLOR = "#ff6361";
 export const HIGHLIGHT_SECONDARY_COLOR = "#ffa600";
+export const HIGHLIGHT_TERTIARY_COLOR = "#488f31";
 export const LINK_COLOR = "#353945";
 export const TERMINAL_COLOR = "#2f4b7c";
 export const PRODUCTION_ENTRY_COLOR = "#003f5c";
@@ -37,6 +38,7 @@ export interface GraphNode {
 
   hoverTooltip?: (grammar: Grammar, tokens: Token[]) => string[];
   children?: GraphNode[];
+  parent?: GraphNode[];
 
   getStartEnd?: [number, number];
 }
@@ -467,6 +469,16 @@ export class Chart {
     return nodes.filter((node: GraphNode) => childrenIds.has(node.id));
   }
 
+  getNodeParent(node: GraphNode, nodes: GraphNode[], links: GraphLink[]) {
+    const parentIds = new Set(
+      links
+        .filter((link: GraphLink) => link.target === node.id)
+        .map((link: GraphLink) => link.source)
+    );
+
+    return nodes.filter((node: GraphNode) => parentIds.has(node.id));
+  }
+
   getNodeLevel(node: GraphNode, nodes: GraphNode[], links: GraphLink[]) {
     if (!node.level) {
       let maxLevel = 0;
@@ -476,6 +488,9 @@ export class Chart {
       children.forEach((node: GraphNode) => {
         maxLevel = Math.max(maxLevel, this.getNodeLevel(node, nodes, links));
       });
+
+      // Add list of parents here
+      node.parent = this.getNodeParent(node, nodes, links);
 
       node.children = children;
       node.level = maxLevel + 1;

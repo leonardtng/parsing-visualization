@@ -17,6 +17,7 @@ import {
   GraphNode,
   HIGHLIGHT_PRIMARY_COLOR,
   HIGHLIGHT_SECONDARY_COLOR,
+  HIGHLIGHT_TERTIARY_COLOR,
   LINK_COLOR,
 } from "@/packages";
 
@@ -110,20 +111,30 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
   const [highlightNodes, setHighlightNodes] = useState<Set<string | null>>(
     new Set()
   );
+  const [highlightParentNodes, setHighlightParentNodes] = useState<
+    Set<string | null>
+  >(new Set());
   const [highlightLinks, setHighlightLinks] = useState<Set<GraphLink | null>>(
     new Set()
   );
+  const [highlightParentLinks, setHighlightParentLinks] = useState<
+    Set<GraphLink | null>
+  >(new Set());
   const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
 
   const updateHighlight = () => {
+    setHighlightParentNodes(highlightParentNodes);
     setHighlightNodes(highlightNodes);
+    setHighlightParentLinks(highlightParentLinks);
     setHighlightLinks(highlightLinks);
   };
 
   const handleNodeHover = (node: GraphNode) => {
     document.body.style.cursor = node ? "pointer" : "default";
+    highlightParentNodes.clear();
     highlightNodes.clear();
     highlightLinks.clear();
+    highlightParentLinks.clear();
     clearHighlightedBlock();
 
     const highlightAllChildren = (node: GraphNode) => {
@@ -135,9 +146,21 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       }
     };
 
+    const highlightAllParents = (node: GraphNode) => {
+      if (node.parent) {
+        node.parent.forEach((parent) => {
+          highlightParentNodes.add(parent.id);
+          highlightAllParents(parent);
+        });
+      }
+    };
+
     if (node) {
       highlightNodes.add(node.id);
       highlightAllChildren(node);
+
+      highlightParentNodes.add(node.id);
+      highlightAllParents(node);
     }
 
     graphData?.links.forEach((link) => {
@@ -147,6 +170,13 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
       if (highlightNodes.has(source.id) && highlightNodes.has(target.id)) {
         highlightLinks.add(link as GraphLink);
       }
+
+      if (
+        highlightParentNodes.has(source.id) &&
+        highlightParentNodes.has(target.id)
+      ) {
+        highlightParentLinks.add(link as GraphLink);
+      }
     });
 
     if (node && node.getStartEnd) {
@@ -155,19 +185,6 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
     }
 
     setHoverNode(node || null);
-    updateHighlight();
-  };
-
-  const handleLinkHover = (link: GraphLink) => {
-    highlightNodes.clear();
-    highlightLinks.clear();
-
-    if (link) {
-      // highlightLinks.add(link);
-      highlightNodes.add(link.source);
-      highlightNodes.add(link.target);
-    }
-
     updateHighlight();
   };
 
@@ -265,13 +282,21 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         linkColor={(link) =>
           highlightLinks.has(link as unknown as GraphLink)
             ? HIGHLIGHT_PRIMARY_COLOR
+            : highlightParentLinks.has(link as unknown as GraphLink)
+            ? HIGHLIGHT_TERTIARY_COLOR
             : LINK_COLOR
         }
         linkWidth={(link) =>
-          highlightLinks.has(link as unknown as GraphLink) ? 2 : 1.5
+          highlightLinks.has(link as unknown as GraphLink) ||
+          highlightParentLinks.has(link as unknown as GraphLink)
+            ? 2
+            : 1.5
         }
         linkDirectionalParticles={(link) =>
-          highlightLinks.has(link as unknown as GraphLink) ? 4 : 0
+          highlightLinks.has(link as unknown as GraphLink) ||
+          highlightParentLinks.has(link as unknown as GraphLink)
+            ? 4
+            : 0
         }
         linkDirectionalArrowLength={5}
         // linkDirectionalArrowRelPos={1}
@@ -313,6 +338,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
               ctx.arc(node.x!, node.y!, nodeScale * 1.4, 0, 2 * Math.PI, false);
               ctx.fillStyle = highlightNodes.has(node.id as string)
                 ? HIGHLIGHT_PRIMARY_COLOR
+                : highlightParentNodes.has(node.id as string)
+                ? HIGHLIGHT_TERTIARY_COLOR
                 : node.color;
               ctx.fill();
               ctx.font = `${fontSize}px Sans-Serif`;
@@ -324,6 +351,8 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
               );
               ctx.fillStyle = highlightNodes.has(node.id as string)
                 ? HIGHLIGHT_PRIMARY_COLOR
+                : highlightParentNodes.has(node.id as string)
+                ? HIGHLIGHT_TERTIARY_COLOR
                 : node.color;
               ctx.roundRect(
                 node.x! - bckgDimensions[0] / 2,
@@ -352,9 +381,11 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
               2 * Math.PI,
               false
             );
-            ctx.fillStyle = highlightNodes.has(node.id as string)
-              ? HIGHLIGHT_SECONDARY_COLOR
-              : node.color;
+            ctx.fillStyle =
+              highlightNodes.has(node.id as string) ||
+              highlightParentNodes.has(node.id as string)
+                ? HIGHLIGHT_SECONDARY_COLOR
+                : node.color;
             ctx.fill();
 
             ctx.fillStyle = node.color;
@@ -365,7 +396,10 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
         }}
         nodeCanvasObjectMode={(node) => {
           if (!node.id) return;
-          return highlightNodes.has(node.id.toString()) ? "after" : "replace";
+          return highlightNodes.has(node.id.toString()) ||
+            highlightParentNodes.has(node.id as string)
+            ? "after"
+            : "replace";
         }}
         onNodeHover={(node) => handleNodeHover(node as GraphNode)}
       />
