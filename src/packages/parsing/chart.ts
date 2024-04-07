@@ -49,7 +49,7 @@ export interface GraphLink {
   grammarKey?: string;
 }
 
-interface Thing {
+interface ProductionEntry {
   lhs: Nonterminal;
   rhs: Rhs;
   positions: number[]; // first and last element is the parent
@@ -140,30 +140,30 @@ export class Chart {
     }
   }
 
-  getThingParent(thing: Thing): SymbolEntry {
+  getProductionEntryParent(productionEntry: ProductionEntry): SymbolEntry {
     return {
-      start: thing.positions[0],
-      end: thing.positions[thing.positions.length - 1],
-      symbol: thing.lhs,
+      start: productionEntry.positions[0],
+      end: productionEntry.positions[productionEntry.positions.length - 1],
+      symbol: productionEntry.lhs,
     };
   }
 
-  getThingChildren(thing: Thing): SymbolEntry[] {
+  getProductionEntryChildren(productionEntry: ProductionEntry): SymbolEntry[] {
     const children = [];
 
     // It's minus 1 and less than (not equal) because we are getting pairs from first to last, and the total pairs is length - 1 (and i is the first element of the pair)
-    for (let i = 0; i < thing.positions.length - 1; i++) {
+    for (let i = 0; i < productionEntry.positions.length - 1; i++) {
       children.push({
-        start: thing.positions[i],
-        end: thing.positions[i + 1],
-        symbol: thing.rhs.elements[i].symbol,
+        start: productionEntry.positions[i],
+        end: productionEntry.positions[i + 1],
+        symbol: productionEntry.rhs.elements[i].symbol,
       });
     }
 
     return children;
   }
 
-  generateThingPositions(
+  generateProductionEntryPositions(
     start: number,
     end: number,
     item: Item
@@ -177,14 +177,14 @@ export class Chart {
         result.add([start]);
       } else {
         const previous = Item.make(item.lhs, item.rhs, item.consumed - 1);
-        const previousThings = this.generateThingPositions(
+        const previousProductionEntries = this.generateProductionEntryPositions(
           start,
           split,
           previous
         );
 
-        previousThings.forEach((thing) => {
-          result.add([...thing, end]);
+        previousProductionEntries.forEach((productionEntry) => {
+          result.add([...productionEntry, end]);
         });
       }
     });
@@ -192,11 +192,15 @@ export class Chart {
     return result;
   }
 
-  generateAllThings(start: number, end: number, item: Item): Set<Thing> {
+  generateAllProductionEntries(
+    start: number,
+    end: number,
+    item: Item
+  ): Set<ProductionEntry> {
     // For each result, pair the number list with the production of that item.
-    const result = new Set<Thing>();
+    const result = new Set<ProductionEntry>();
 
-    const positions = this.generateThingPositions(start, end, item);
+    const positions = this.generateProductionEntryPositions(start, end, item);
 
     positions.forEach((positionList) => {
       result.add({
@@ -209,17 +213,17 @@ export class Chart {
     return result;
   }
 
-  generateThingChart(): AutoMap<
+  generateProductionEntryChart(): AutoMap<
     number,
-    AutoMap<number, AutoMap<Symbol, Set<Thing>>>
+    AutoMap<number, AutoMap<Symbol, Set<ProductionEntry>>>
   > {
     // Go through the chart's items and look only at the items that are complete.
     // ie the consumed is equal to the length of the rhs
-    // For each complete item, call generateAllThings(start, end, item)
+    // For each complete item, call generateAllProductionEntries(start, end, item)
 
     const result: AutoMap<
       number,
-      AutoMap<number, AutoMap<Symbol, Set<Thing>>>
+      AutoMap<number, AutoMap<Symbol, Set<ProductionEntry>>>
     > = new AutoMap(() => new AutoMap(() => new AutoMap(() => new Set())));
 
     this.items.forEach((endMap, start) => {
@@ -227,10 +231,14 @@ export class Chart {
         itemMap.forEach((split, item) => {
           if (item.consumed === item.rhs.elements.length) {
             // console.log("item", item, start, end);
-            const things = this.generateAllThings(start, end, item);
+            const productionEntries = this.generateAllProductionEntries(
+              start,
+              end,
+              item
+            );
 
-            things.forEach((thing) => {
-              result.get(start).get(end).get(item.lhs).add(thing);
+            productionEntries.forEach((productionEntry) => {
+              result.get(start).get(end).get(item.lhs).add(productionEntry);
             });
           }
         });
@@ -241,47 +249,48 @@ export class Chart {
   }
 
   generateGraphData() {
-    const thingChart = this.generateThingChart();
+    const productionEntryChart = this.generateProductionEntryChart();
 
     let nodes: GraphNode[] = [];
 
     let links: GraphLink[] = [];
 
-    thingChart.forEach((rows) => {
+    productionEntryChart.forEach((rows) => {
       rows.forEach((cols) => {
-        cols.forEach((things) => {
-          things.forEach((thing) => {
-            const parent = this.getThingParent(thing);
-            const children = this.getThingChildren(thing);
+        cols.forEach((productionEntries) => {
+          productionEntries.forEach((productionEntry) => {
+            const parent = this.getProductionEntryParent(productionEntry);
+            const children = this.getProductionEntryChildren(productionEntry);
 
             if (
-              thing.positions[0] === thing.positions[thing.positions.length - 1]
+              productionEntry.positions[0] ===
+              productionEntry.positions[productionEntry.positions.length - 1]
             ) {
               return;
             }
 
             nodes.push({
-              id: JSON.stringify(thing),
+              id: JSON.stringify(productionEntry),
               isSymbol: false,
               color: PRODUCTION_ENTRY_COLOR,
               name: (tokens) => "Production Entry",
               hoverTooltip: (grammar: Grammar, tokens: Token[]) => [
-                `${thing.lhs.name} ➜ ${
-                  thing.rhs.elements
+                `${productionEntry.lhs.name} ➜ ${
+                  productionEntry.rhs.elements
                     .map((e) => (e.symbol as Terminal | Nonterminal).name)
                     .join(" ") || '""'
-                } [${thing.positions.join(",")}]`,
+                } [${productionEntry.positions.join(",")}]`,
               ],
             });
 
             links.push({
               source: JSON.stringify(parent),
-              target: JSON.stringify(thing),
+              target: JSON.stringify(productionEntry),
             });
 
             children.forEach((child) => {
               links.push({
-                source: JSON.stringify(thing),
+                source: JSON.stringify(productionEntry),
                 target: JSON.stringify(child),
               });
             });

@@ -158,7 +158,7 @@ const Editor = () => {
         onChange={onInputChange}
         name="editor"
         editorProps={{ $blockScrolling: true }}
-        height={isWeb ? "100%" : "250px"}
+        height={isWeb ? "100%" : "100px"}
         width="100%"
         markers={markers}
         highlightActiveLine={false}

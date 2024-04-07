@@ -80,7 +80,7 @@ const ForceGraph: FC<Props> = ({ isRendered = true }: Props) => {
             node.fx = BASE_LAYER_SEPARATION * node.leafStart;
             node.fy = 0;
           } else {
-            // Things and Nonterminals
+            // Production Entries and Nonterminals
             if (!newGraphData.hasCycle) {
               const baseLayerLength = new Set(
                 newGraphData?.nodes
