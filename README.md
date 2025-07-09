@@ -147,14 +147,6 @@ export enum GrammarKey {
 - **Levels**: Nested structure demonstration
 - **Ambiguous**: Example of ambiguous grammar (for demo purposes)
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🙏 Acknowledgments
 
 - Built on top of the Cocke–Younger–Kasami (CYK) parsing algorithm
-
----
-
-For more information or support, please open an issue on GitHub.
